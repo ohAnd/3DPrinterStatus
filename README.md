@@ -1,35 +1,40 @@
 # 3DPrinterStatus
 
 - [3DPrinterStatus](#3dprinterstatus)
-  - [release](#release)
-  - [development](#development)
   - [description](#description)
-- [development status](#development-status)
+  - [downloads](#downloads)
+    - [get latest release](#get-latest-release)
+    - [get latest debug build](#get-latest-debug-build)
+  - [development status](#development-status)
   - [screenshots](#screenshots)
   - [features planned/ done](#features-planned-done)
   - [info](#info)
-
-
-## get latest debug build
-[![develop - Build Android debug app](https://github.com/ohAnd/3DPrinterStatus/actions/workflows/cordovaBuildAndroid.yml/badge.svg)](https://github.com/ohAnd/3DPrinterStatus/actions/workflows/cordovaBuildAndroid.yml)
-
 
 ## description
 project is written in NodeJS and built with cordova
 currently only builds for android available
 
-# development status
-![GitHub issues](https://img.shields.io/github/issues/ohand/3dprinterstatus) ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/ohand/3DPrinterStatus)
+## downloads
+### get latest release
+[![GitHub all releases](https://img.shields.io/github/downloads/ohand/3dprinterstatus/total)](https://github.com/ohAnd/3DPrinterStatus/releases)
+
+
+### get latest debug build
+[![develop - Build Android debug app](https://github.com/ohAnd/3DPrinterStatus/actions/workflows/cordovaBuildAndroid.yml/badge.svg)](https://github.com/ohAnd/3DPrinterStatus/actions/workflows/cordovaBuildAndroid.yml)
+
+
+## development status
+[![GitHub issues](https://img.shields.io/github/issues/ohand/3dprinterstatus)](https://github.com/ohAnd/3DPrinterStatus/issues) [![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/ohand/3DPrinterStatus)](https://github.com/ohAnd/3DPrinterStatus/issues?q=is%3Aissue+is%3Aclosed)
 
 
 ## screenshots
-<img src="doc/Screenshot_home1.jpg" width="30%">
-<img src="doc/Screenshot_home2.jpg" width="30%">
-<img src="doc/Screenshot_infos.jpg" width="30%">
+<img src="doc/Screenshot_home1.jpg" width="200px">
+<img src="doc/Screenshot_home2.jpg" width="200px">
+<img src="doc/Screenshot_infos.jpg" width="200px">
 
-<img src="doc/Screenshot_settings.jpg" width="30%">
-<img src="doc/notification_progress.jpg" width="30%">
-<img src="doc/notification_band.jpg" width="30%">
+<img src="doc/Screenshot_settings.jpg" width="200px">
+<img src="doc/notification_progress.jpg" width="200px">
+<img src="doc/notification_band.jpg" width="200px">
 
 ## features planned/ done
 - open content the app recognized the finish state of the current job. This state could trigger a smart plug with MQTT or IFTTT. So it is maybe possible to integrate with a specific call on an url or direct MQTT integration.
