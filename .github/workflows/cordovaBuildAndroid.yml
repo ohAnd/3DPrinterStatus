@@ -49,7 +49,7 @@ jobs:
         run: |
           rm ${{ github.workspace }}/hooks/buildnumber.txt
           touch ${{ github.workspace }}/hooks/buildnumber.txt
-          printf -v BUILDNUMBER "%04d" ${{github.run_number}}
+          printf -v BUILDNUMBER "%04ddev" ${{github.run_number}}
           echo $BUILDNUMBER >> ${{ github.workspace }}/hooks/buildnumber.txt
           echo "cat ../buildnumber.txt"
           cat ${{ github.workspace }}/hooks/buildnumber.txt
@@ -66,7 +66,7 @@ jobs:
       - name: Upload dev APK
         uses: actions/upload-artifact@v3
         with:
-          name: 3DprinterStatus_${{ env.CURRENT_VERSIONNUMBER }}.${{ env.CURRENT_BUILDNUMBER }}.apk
+          name: 3DprinterStatus_${{ env.CURRENT_VERSIONNUMBER }}.${{ env.CURRENT_BUILDNUMBER }}dev.apk
           path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
 #      - name: Build & Publish Debug APK
 #        uses: kyze8439690/action-release-releaseapk@master
