@@ -108,7 +108,7 @@ let sessionCheckCounter = 0;
 function sessionCheck(printerSocket) {
     sessionCheckTimmer = setInterval(function () {
         let socketState = getSocketState(printerSocket);
-        checkAndSwitchInBackgroundMode(printerSocket);
+        // checkAndSwitchInBackgroundMode(printerSocket);
         // 1st layer
         if (socketState == "OPENED") {
             // 2nd layer
