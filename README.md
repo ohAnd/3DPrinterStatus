@@ -1,28 +1,41 @@
 # 3DPrinterStatus
 
 - [3DPrinterStatus](#3dprinterstatus)
-  - [get latest debug build](#get-latest-debug-build)
+  - [release](#release)
+  - [development](#development)
   - [description](#description)
+- [development status](#development-status)
   - [screenshots](#screenshots)
   - [features planned/ done](#features-planned-done)
   - [info](#info)
 
 
-## get latest debug build
+## release
+![GitHub all releases](https://img.shields.io/github/downloads/ohAnd/3DPrinterStatus/total)
+
+find the latest reelease in the main branch
+
+## development
+get latest debug build
 [![Build Android debug app](https://github.com/ohAnd/3DPrinterStatus/actions/workflows/cordovaBuildAndroidDebugc.yml/badge.svg)](https://github.com/ohAnd/3DPrinterStatus/actions/workflows/cordovaBuildAndroidDebugc.yml)
+
 
 ## description
 project is written in NodeJS and built with cordova
 currently only builds for android available
 
-## screenshots
-<img src="doc/Screenshot_home1.jpg" width="33%">
-<img src="doc/Screenshot_home2.jpg" width="33%">
-<img src="doc/Screenshot_infos.jpg" width="33%">
+# development status
+![GitHub issues](https://img.shields.io/github/issues/ohand/3dprinterstatus) ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/ohand/3DPrinterStatus)
 
-<img src="doc/Screenshot_settings.jpg" width="33%">
-<img src="doc/notification_progress.jpg" width="33%">
-<img src="doc/notification_band.jpg" width="33%">
+
+## screenshots
+<img src="doc/Screenshot_home1.jpg" width="30%">
+<img src="doc/Screenshot_home2.jpg" width="30%">
+<img src="doc/Screenshot_infos.jpg" width="30%">
+
+<img src="doc/Screenshot_settings.jpg" width="30%">
+<img src="doc/notification_progress.jpg" width="30%">
+<img src="doc/notification_band.jpg" width="30%">
 
 ## features planned/ done
 - open content the app recognized the finish state of the current job. This state could trigger a smart plug with MQTT or IFTTT. So it is maybe possible to integrate with a specific call on an url or direct MQTT integration.
