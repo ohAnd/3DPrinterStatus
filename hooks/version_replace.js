@@ -18,7 +18,11 @@ console.log("Version:", version);
 writeStringToFile(version,"hooks/versionnumber.txt");
 
 var buildnumber = parseInt(get_string_from_file("hooks/buildnumber.txt"));
-buildnumber = ("0000" + buildnumber).slice(-4);
+var devState = '';
+if((get_string_from_file("hooks/buildnumber.txt")).endsWith("dev")) {
+    devState = 'dev';
+}
+buildnumber = ("0000" + buildnumber).slice(-4) + devState;
 console.log("build number:", buildnumber);
 
 let androidversion = version.split(".")[0] + "." + version.split(".")[1] + "." + version.split(".")[2] + "." + buildnumber;
