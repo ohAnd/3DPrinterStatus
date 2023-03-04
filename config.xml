@@ -19,7 +19,7 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
 
-    <!-- <hook type="after_prepare" src="hooks/version_replace.js" /> -->
+    <hook type="after_prepare" src="hooks/version_replace.js" />
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="KeepRunning" value="true"/>
