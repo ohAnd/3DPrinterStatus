@@ -1,11 +1,13 @@
-name: develop - Build Android debug app
+name: main - Build Android debug app
 
 on:
- # Triggers the workflow on push or pull request events but only for the "main" branch
- push:
-   branches: [ "develop" ]
- pull_request:
-   branches: [ "develop" ]
+  push:
+    # branches:
+    #   - 'main'
+    #   - 'develop'
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - 'v*' # Push events to matching *, i.e. v1.0, v20.15.10
 
 jobs:
   build:
@@ -64,18 +66,26 @@ jobs:
         run: |
           cordova build android
         
-      - name: Upload dev APK
-        uses: actions/upload-artifact@v3
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: 3DprinterStatus_${{ env.CURRENT_VERSIONNUMBER }}.${{ env.CURRENT_BUILDNUMBER }}.apk
-          path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
-#      - name: Build & Publish Debug APK
-#        uses: kyze8439690/action-release-releaseapk@master
-#        env:
-#              GITHUB_TOKEN: ${{ secrets.TOKEN }}
-#              APP_FOLDER: platforms/android/app/build/outputs/apk/debug
-      # - name: Releasing using Hub
-      #   uses: r0user/release-apk@main
-      #   env:
-      #    GITHUB_TOKEN: ${{ secrets.TOKEN }}
-      #    APP_FOLDER: platforms/android/app/build/outputs/apk/debug
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            changes are documented in the issue section
+            in future it will generated based on closed issues
+          draft: true
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          asset_name: 3DprinterStatus_${{ env.CURRENT_VERSIONNUMBER }}.${{ env.CURRENT_BUILDNUMBER }}.apk
+          asset_content_type: application/zip
