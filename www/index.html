@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+    <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport"
+        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <link rel="stylesheet" type="text/css" href="css/Aerophane.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <title>3D printer status</title>
+
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <button>Menu</button>
+        <h1 id="headerTitle"></h1>
+    </header>
+
+    <article id="home">
+        <!-- <section style="display: none;"> -->
+        <section>
+            <header>
+                <h2>camera view</h2>
+            </header>
+            <!-- <div id="deviceready" class="blink">
+                <p class="event listening">Connecting to Device</p>
+                <p class="event received">Device is Ready</p>
+            </div> -->
+            <p>what's going on inside...</p>
+            <p>
+                <!-- <img id="printerVideo" src="" onerror="this.onerror=null;this.src='../img/cam_example.jpg';"> -->
+                <!-- <img id="printerVideo" src=""> -->
+                <img src="img/cam_example.jpg">
+                <!-- <img src="" onerror="this.onerror=null;this.src='../img/cam_example.jpg';"> -->
+            </p>
+            <p style="text-align: center;">short workaround ;-) <a id="printerVideoLink" href="">click_me</a></p>
+        </section>
+        <section>
+            <div>debug</div>
+            <div>
+                <list_left>app started:</list_left>
+                <list_right id="appStarted">none</list_right>
+            </div>
+            <div>
+                <list_left>connection request state:</list_left>
+                <list_right id="baseConnection">none</list_right>
+            </div>
+            <div>
+                <list_left>connection retry counter:</list_left>
+                <list_right id="global.info.settings.retryCnt">none</list_right>
+            </div>
+            <div>
+                <list_left>sessionState:</list_left>
+                <list_right id="sessionState">none</list_right>
+            </div>
+            <div>
+                <list_left>session timer:</list_left>
+                <list_right id="refreshTimer">none</list_right>
+            </div>
+            <pre id="debugLog" style="max-height: 200px; scrollbar-width: 2px;">debug log ...<br/></pre>
+        </section>
+        <section>
+            <header>
+                <h2>progress</h2>
+            </header>
+            <!-- <p>show the progress with a bar only if running</p> -->
+            <div>
+                <div id="printerProgress">
+                    <div id="printerProgressBar"></div>
+                </div>
+                <list_right>
+                    <num id="global.printerData.job.progress">0</num> %
+                </list_right>
+            </div>
+        </section>
+        <section>
+            <header>
+                <h2>temperatures</h2>
+            </header>
+            <div>
+                <list_left>Extruder temperature:</list_left>
+                <list_right>
+                    <num id="global.printerData.temps.ext_current">0</num> °C (<num
+                        id="global.printerData.temps.ext_target">0</num> °C)
+                </list_right>
+            </div>
+            <div>
+                <list_left>Bed temperature:</list_left>
+                <list_right>
+                    <num id="global.printerData.temps.bed_current">0</num> °C (<num
+                        id="global.printerData.temps.bed_target">0</num> °C)
+                </list_right>
+            </div>
+        </section>
+        <section>
+            <header>
+                <h2>head position</h2>
+            </header>
+            <div>
+                <list_left>X:</list_left>
+                <list_right>
+                    <num id="global.printerData.headPos.X">0</num> mm
+                </list_right>
+            </div>
+            <div>
+                <list_left>Y:</list_left>
+                <list_right>
+                    <num id="global.printerData.headPos.Y">0</num> mm
+                </list_right>
+            </div>
+            <div>
+                <list_left>Z:</list_left>
+                <list_right>
+                    <num id="global.printerData.headPos.Z">0</num> mm
+                </list_right>
+            </div>
+            <div>
+                <list_left>A:</list_left>
+                <list_right>
+                    <num id="global.printerData.headPos.A">0</num> mm
+                </list_right>
+            </div>
+            <div>
+                <list_left>B:</list_left>
+                <list_right>
+                    <num id="global.printerData.headPos.B">0</num> mm
+                </list_right>
+            </div>
+        </section>
+        <section>
+            <header>
+                <h2>machine status</h2>
+            </header>
+            <div>
+                <list_left>Status:</list_left>
+                <list_right id="global.printerData.status.Status">Build_from_SD</list_right>
+            </div>
+            <div>
+                <list_left>MachineStatus:</list_left>
+                <list_right id="global.printerData.status.MachineStatus">READY</list_right>
+            </div>
+            <div>
+                <list_left>MoveMode:</list_left>
+                <list_right id="global.printerData.status.MoveMode">STOPPED</list_right>
+            </div>
+            <div>
+                <list_left>Endstop:</list_left>
+                <list_right id="global.printerData.status.Endstop">OPEN</list_right>
+            </div>
+        </section>
+        <section>
+            <header>
+                <h2>base printer info</h2>
+            </header>
+            <div>
+                <list_left>Name:</list_left>
+                <list_right id="global.printerData.info.Name">loremIpsum</list_right>
+            </div>
+            <div>
+                <list_left>IP:</list_left>
+                <list_right id="global.printerData.base.printerIPadress">loremIpsum</list_right>
+            </div>
+            <div>
+                <list_left>Seriennummer:</list_left>
+                <list_right id="global.printerData.info.SN">012345678</list_right>
+            </div>
+            <div>
+                <list_left>Firmware:</list_left>
+                <list_right id="global.printerData.info.Firmware">1.1.1</list_right>
+            </div>
+            <div>
+                <list_left>Machine Type:</list_left>
+                <list_right id="global.printerData.info.Type">?</list_right>
+            </div>
+            <!-- <button id="dialogAlert">ALERT</button>
+                <button id="dialogConfirm">CONFIRM</button>
+                <button id="dialogBeep">BEEP</button> -->
+            <!-- <footer>
+
+            </footer> -->
+        </section>
+        <!-- <section>
+            <header>
+                <h3>Section Header H3</h3>
+            </header>
+
+            <p>Aerophane does not use copious classes to connect styles to HTML elements. Elements acquire their styling
+                based on their position in the document. For example, the <code>&lt;article&gt;</code> tag is the basic
+                container, a <code>&lt;section&gt;</code>` element inside an article is displayed in a "card" style, and
+                a <code>&lt;header&gt;</code>` inside a section card looks like the blue space above. Check the source
+                code of the examples for specifics.
+        </section>
+
+        <section>
+            <header>
+                <h4>Section Header H4</h4>
+            </header>
+            <p>Aerophane comes with a few common UI features, most notably, a <button id="exampleDialog">dialog</button>
+            <p>Once you initialize the Aerophane object, you have access to a few other JavaScript utility functions
+                including:
+
+            <h4>forEachElement</h4>
+            <p>The JavaScript forEach array method doesn't work on element collections, so I find his handy to avoid
+                writing for loops.
+            <pre>aero.forEachElement(<em>elementCollection</em>, <em>elementFunction</em>);</pre>
+
+            <h4>classname</h4>
+            <p>Another utility function that Aerophane adds that would be completely unnecessary if you are using jQuery
+                is a method to work with class attributes.
+            <pre>aero.classname.add(<em>element</em>, <em>classname</em>);
+    aero.classname.remove(<em>element</em>, <em>classname</em>);
+    </pre>
+
+            <h4>touchclick</h4>
+            <p>A simple hack to remove some of the unnecessary sluggishness of hybrid mobile is to replace the
+                JavaScript <code>onclick</code> event handler with <code>ontouchstart</code>. The
+                <code>aero.touchclick</code> method event will do this while falling back to click on none-touch
+                interfaces.</p>
+        </section>
+
+        <section>
+            <h2>Modular File Structure</h2>
+            <p>Each screen is a separate HTML page in its own folder. Files unique to the page - CSS, JavaScript, images
+                - are contained in that folder. Application-wide files should be placed in the <code>inc</code> folder.
+        </section> -->
+        <!-- <div></div> -->
+        <footer>
+            <!-- <p>&copy; 2023 3DprinterState</p> -->
+        </footer>
+
+    </article>
+
+    <article id="templates" style="display:none;">
+        <section class="list">
+            <header>
+                <h4>model sites</h4>
+            </header>
+
+            <div>
+                <i>1</i>
+                <img id="logo" src="img/printables-logo.png">
+                <h3><a href="https://www.printables.com/de/model">printables</a></h3>
+                <p>Prusa Research by JOSEF PRUSA - 3D models, community, competitions, brands, ...</p>
+            </div>
+
+            <div>
+                <i>2</i>
+                <img id="logo" src="img/thingiverse.png">
+                <h3><a href="https://www.thingiverse.com/">thingiverse</a></h3>
+                <p>Ultimaker - MakerBot's Thingiverse is a thriving design community for discovering, making, and
+                    sharing 3D printable things. As the world's largest 3D printing community, we believe that everyone
+                    should be encouraged to create and remix 3D things, no matter their technical expertise or previous
+                    experience.</p>
+            </div>
+
+            <div>
+                <i>3</i>
+                <img id="logo" src="img/ultimaker.png">
+                <h3>ultimaker</h3>
+                <p>Paragraph information about thing #3.</p>
+                <p>And more information about thing #3.</p>
+                <p>And more information about thing #3.</p>
+            </div>
+        </section>
+
+        <section class="list">
+            <header>
+                <h4>guides & docs</h4>
+            </header>
+
+            <div>
+                <i>1</i>
+                <h3><a href="https://www.3dprima.com/de/3dprima/3d-druck-guide-haeufige-probleme-gruende-loesungen">3D
+                        print guide - 3D printer problem solving</a></h3>
+                <p>Im 3D Prima 3D Druck Guide erhältst du hilfreiche Tipps & Tricks für deinen 3D Drucker. Erkenne
+                    häufige 3D Druck Fehler und optimiere die Qualität deiner 3D Drucke. </p>
+            </div>
+
+            <div>
+                <i>2</i>
+                <h3><a href="https://help.prusa3d.com/de/article/wasserdichte-drucke_112324">waterproof printings</a>
+                </h3>
+                <p>A print coming from molten plastic one might assume that it is water-tight, but that is not always
+                    the case. How to make an object look good and what makes it watertight does not always overlap.</p>
+            </div>
+
+            <div>
+                <i>3</i>
+                <h3><a
+                        href="https://blog.prusa3d.com/watertight-3d-printing-pt1-vases-cups-and-other-open-models_48949/">Watertight
+                        3D printing PT1: Vases, cups and other open models</a></h3>
+                <p>Have you ever tried printing vases, bowls, cups and other waterproof models? If so, what type of
+                    filament did you use, what settings did you print it with? Were you ever able to make your model
+                    watertight?</p>
+            </div>
+        </section>
+
+        <div></div>
+
+    </article>
+
+    <article id="settings" style="display:none;">
+        <form>
+            <fieldset>
+                <legend>printer connection</legend>
+
+                <label>adress</label>
+                <input id="global.printerData.base.printerIPadress" class="storageValue" type="text"
+                    placeholder="192.168.1.0">
+                <p class="smallText">e.g. 192.168.1.0</p>
+
+                <label>port</label>
+                <input id="global.printerData.base.printerIPport" class="storageValue" type="number" placeholder="8899"
+                    min="1" max="65535">
+                <p class="smallText">e.g. 8899</p>
+
+                <label>stay connected in background <input id="global.info.settings.holdConnectionOn"
+                        class="storageValue" type="checkbox"></label>
+                <label></label>
+                <label>to check the right functionality inside your local network</label>
+                <button id="testTCPConnection">test connection</button>
+            </fieldset>
+            <hr>
+            <fieldset>
+                <legend>printer webcam</legend>
+                <label>different webcam link needed <input id="global.printerData.base.printerIPadressAlternative"
+                        class="storageValue" type="checkbox"></label>
+                <p class="smallText">use other host adress or link for webcam then standard printer path</i></p>
+
+                <label id="printerIPadressStandardEntry">
+                    <label>used path to webcam</label>
+                    <p id="printerCamLinkUsed" style="font-style: italic;"></p>
+                </label>
+
+                <label id="printerIPadressAlternativeEntry">
+                    <label>alternative link to webcam</label>
+                    <input id="global.printerData.base.printerCamLink" class="storageValue urlcheck" type="url"
+                        placeholder="http://192.168.1.0">
+                    <p class="smallText">e.g. http://192.168.0.1:8080/?action=stream</p>
+                </label>
+
+
+
+                <!-- <label>Password</label>
+                <input type="password"> -->
+
+
+
+                <!-- <h2>Radio Buttons (h2 form)</h2>
+                <label class="radio"><input name="gender" type="radio" checked="checked"> Default</label>
+                <label class="radio"><input name="gender" type="radio"> Yes</label>
+                <label class="radio"><input name="gender" type="radio"> No</label> -->
+
+                <!-- <label>Select</label>
+                <select class="aeroSelect">
+                    <option selected="selected">Select your continent
+                    <option>Asia
+                    <option>Africa
+                    <option>Europe
+                    <option>North America
+                    <option>South America
+                    <option>Australia
+                    <option>Antarctica
+                </select> -->
+
+            </fieldset>
+            <hr>
+            <fieldset>
+                <legend>appearance</legend>
+                <label>dark mode (invert colors) <input id="global.info.settings.isDarkModeOn" class="storageValue"
+                        type="checkbox"></label>
+                <p class="smallText">@todo - has to be developed</p>
+
+                <!-- <label>background color
+                <input type="color"></label> -->
+
+                <!-- <label>email</label>
+                <input type="email">
+
+                <label>date</label>
+                <input type="date">
+
+                <label>datetime-local</label>
+                <input type="datetime-local">
+
+                <label>file</label>
+                <input type="file">
+
+                <label>number</label>
+                <input type="number">
+
+                <label>range</label>
+                <input type="range">
+
+                <label>search</label>
+                <input type="search"> -->
+
+            </fieldset>
+            <hr>
+            <fieldset>
+                <legend>info</legend>
+                <div>
+                    <list_left>update possible</list_left>
+                    <list_right>
+                        <!-- <a href="https://drive.google.com/drive/folders/11qkNDKmPev2OmKYw92nLPmlC7S9FQGdR">check here</a> -->
+                        <a href="https://www.nicandi.de/apps/3dprinterstatus/">check here</a>
+                    </list_right>
+
+                </div>
+                <div>
+                    <list_left>app-version:</list_left>
+                    <list_right class="appversion"></list_right>
+                </div>
+                <div>
+                    <list_left>build number:</list_left>
+                    <list_right class="build"></list_right>
+                </div>
+                <div>
+                    <list_left>build date:</list_left>
+                    <list_right class="builddate"></list_right>
+                </div>
+            </fieldset>
+
+        </form>
+    </article>
+
+    <footer>
+        <!-- will be filled by script -->
+    </footer>
+
+    <div class="dialog">
+        <h2>Test Connection</h2>
+        <p>here you can check the connection with some logging and details to the conenction handling</p>
+        <!-- <pre>aero.showDialog(<em>element</em>);</pre> -->
+        <pre id="testTCPConnectionLog">connection log will presented here
+        </pre>
+
+        <p>
+            <button id="testTCPConnectionStart">start</button>
+            <button id="testTCPConnectionStop" disabled="true">stop</button><br />
+            <button id="testTCPConnectionGetInfo" disabled="true">get info</button>
+            <button id="testTCPConnectionGetStatus" disabled="true">get status</button>
+            <button id="testTCPConnectionGetTemp" disabled="true">get temp</button>
+            <button id="testTCPConnectionGetProgress" disabled="true">get progress</button>
+        </p>
+        <p>
+            <small>Touch the background to close.</small>
+        </p>
+    </div>
+
+    <!-- <footer class="form"> -->
+    <!-- <button>Cancel</button> -->
+    <!-- <button class="main_action">Save</button> -->
+    <!-- </footer> -->
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/global.js"></script>
+    <script type="text/javascript" src="js/Aerophane.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/protocol.js"></script>
+    <script type="text/javascript" src="js/settings.js"></script>
+</body>
+
+</html>

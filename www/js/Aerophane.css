@@ -1,0 +1,553 @@
+* {
+    /* box-sizing: border-box; */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+html {
+    font-family: sans-serif;
+    letter-spacing: 0.02em;
+    background: #f5f5f5;
+    color: #555;
+}
+
+body {
+    margin: 0;
+    padding-top: 56px;
+    /* From Cordova default template */
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: none;
+    -webkit-user-select: none;
+    background: #fff;
+}
+
+body.stop-scrolling {
+    height: 100%;
+    overflow: hidden;
+}
+
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+}
+
+h1 {
+    font-size: 20px;
+}
+
+h2 {
+    font-size: 18px;
+}
+
+h3 {
+    font-size: 16px;
+}
+
+h4 {
+    font-size: 14px;
+}
+
+h5 {
+    font-size: 12px;
+}
+
+h6 {
+    font-size: 10px;
+}
+
+pre {
+    margin: 12px 16px;
+    padding: 8px;
+    overflow: auto;
+    background: #eee;
+    max-height: 70%;
+    font-size: smaller;
+}
+
+article>h1,
+article>h2,
+article>h3,
+article>h4,
+article>h5,
+article>h6 {
+    margin: 1.5em 0 1.5em 16px;
+}
+
+article button,
+article input[type="button"],
+article input[type="submit"],
+article input[type="reset"],
+body>footer button,
+body>footer input[type="button"],
+body>footer input[type="submit"],
+body>footer input[type="reset"] {
+    text-transform: uppercase;
+    margin: 8px;
+    padding: 12px;
+    background: #fff;
+    border: 0 none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+button:focus,
+input:focus {
+    outline: 0 none;
+}
+
+article {
+    /* padding-bottom: 56px; */
+    margin: 8px;
+    overflow: visible;
+    /* max-width: 580px; */
+    max-width: 100%;
+}
+
+article>*:last-child {
+    padding-bottom: 60px;
+    width: 100%;
+    float: left;
+}
+
+article p,
+body>div.dialog p {
+    margin: 12px 16px;
+    line-height: 1.4em;
+    font-size: 15px;
+}
+
+article li {
+    margin-bottom: 0.3em;
+    line-height: 1.4em;
+    font-size: 16px;
+}
+
+body>header {
+    position: fixed;
+    overflow: auto;
+    left: 0;
+    top: 0;
+    right: 0;
+    background: #f5f5f5;
+    height: 56px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+    background: #eee;
+    color: #333;
+}
+
+body>header h1 {
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+    line-height: 56px;
+    white-space: nowrap;
+}
+
+body>header button {
+    margin: 0 12px 0 0;
+    padding: 12px;
+    width: 56px;
+    height: 56px;
+    float: left;
+    background: transparent;
+    border: 0 none;
+    color: #fff;
+}
+
+body>header button div {
+    margin: 3px 4px;
+    height: 2px;
+    background: #888;
+    border-radius: 2px;
+}
+
+article>section {
+    margin: 16px 0;
+    border-radius: 2px;
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, .4);
+    overflow: auto;
+    background: #fff;
+    padding-bottom: 16px;
+    width: 100%;
+    float: left;
+}
+
+article>section:first-child {
+    margin-top: 12px;
+}
+
+article>section>header {
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    background: #666;
+}
+
+article>section h2,
+body>div.dialog h2 {
+    margin-left: 16px;
+    font-weight: normal;
+    font-size: 20px;
+}
+
+article>section>header h2 {
+    margin: 0;
+    padding: 16px 16px 16px;
+    color: #fff;
+}
+
+article>section h3,
+body>div.dialog h3 {
+    margin-left: 18px;
+    font-weight: normal;
+    font-size: 18px;
+}
+
+article>section>header h3 {
+    margin: 0;
+    padding: 16px 16px 16px;
+    color: #fff;
+}
+
+article>section h4,
+body>div.dialog h4 {
+    margin-left: 16px;
+    font-weight: normal;
+    font-size: 18px;
+}
+
+article>section>header h4 {
+    margin: 0;
+    padding: 16px;
+    color: #fff;
+}
+
+article>section>footer {
+    padding: 4px;
+    border-top: 1px solid #ddd;
+}
+
+article>footer {
+    margin: 8px -8px -56px;
+    padding: 8px;
+    background: #666;
+    color: #fff;
+}
+
+body>nav#main {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    width: 0;
+    background: #fff;
+    transition: width 0.2s;
+}
+
+body>nav#main h2 {
+    margin: 32px 0 16px 16px;
+    font-size: 18px;
+    font-weight: normal;
+}
+
+body>nav#main p {
+    margin: 0;
+    font-size: 14px;
+}
+
+body>nav#main p a {
+    padding: 16px;
+    display: block;
+    text-decoration: none;
+    color: #333;
+}
+
+body>nav p.main a:hover,
+#aeroDialogSelect>div:hover {
+    cursor: pointer;
+    background: #eee;
+}
+
+body>footer {
+    position: fixed;
+    overflow: auto;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    background: #f5f5f5;
+    border-top: 1px solid #ddd;
+}
+
+body>footer.form {
+    text-align: right;
+}
+
+body>footer p {
+    padding-left: 16px;
+    font-size: small;
+}
+
+/* Lists */
+article.list>div,
+section.list>div {
+    margin: -8px -8px 0;
+    padding: 8px 8px 8px 64px;
+    background: #fff;
+    position: relative;
+    min-height: 52px;
+}
+
+section.list>div {
+    margin: 0;
+    padding: 8px 8px 8px 56px;
+    background: #fff;
+    position: relative;
+    min-height: 52px;
+}
+
+article.list>div i,
+section.list>div i {
+    display: block;
+    position: absolute;
+    top: 12px;
+    left: 20px;
+    line-height: 24px;
+    width: 24px;
+    height: 24px;
+    background: #666;
+    border-radius: 12px;
+    color: #fff;
+    font-style: normal;
+    font-size: 12px;
+    text-align: center;
+}
+
+section.list>div i {
+    left: 12px;
+}
+
+article.list>div:first-child,
+section.list>div:first-child {
+    padding-top: 16px;
+}
+
+article.list>div:last-child,
+section.list>div:last-child {
+    padding-bottom: 16px;
+}
+
+article.list>div:first-child i,
+section.list>div:first-child i {
+    top: 20px;
+}
+
+article.list>div h3,
+section.list>div h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+article.list>div h3:last-child,
+section.list>div h3:last-child {
+    padding-top: 8px;
+}
+
+article.list>div p,
+section.list>div p {
+    margin: 0;
+    font-size: 14px;
+    color: #888;
+}
+
+article>section.list {
+    margin-top: 16px;
+    border: 0 none;
+}
+
+article>section.list>div:first-child {
+    padding-top: 8px;
+}
+
+/* forms */
+form {
+    background: #fff;
+}
+
+article>form {
+    margin: -8px -8px 0;
+}
+
+form h2 {
+    font-size: 14px;
+}
+
+fieldset {
+    padding: 4px 8px 32px;
+    border: 0 none;
+}
+
+legend {
+    padding: 24px 0 0;
+    display: block;
+    font-size: 18px;
+}
+
+label {
+    margin: 4px 0;
+    padding-top: 8px;
+    font-size: 14px;
+    display: block;
+    color: #888;
+}
+
+label.radio {
+    display: inline;
+}
+
+input:not([type]),
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+select {
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 90%;
+    font-size: 15px;
+}
+
+select {
+    height: 36px;
+    background: #fff;
+}
+
+button.main_action {
+    color: green;
+}
+
+/* tabs */
+nav.tabs {
+    padding: 24px 0 0;
+    position: static;
+    overflow: auto;
+    width: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid #ddd;
+}
+
+nav.tabs a {
+    padding: 8px 16px;
+    display: inline-block;
+    text-decoration: none;
+    color: #333;
+}
+
+nav.tabs a:active {
+    background: rgba(0, 0, 221, 0.2);
+    color: #333;
+}
+
+article.tabs {
+    display: none;
+}
+
+article.tabs.active {
+    display: block;
+}
+
+/* dialog*/
+select.aeroSelect {
+    visibility: hidden;
+}
+
+button.dialog {
+    text-transform: none;
+    margin: 0;
+    padding: 4px;
+    font-weight: normal;
+    box-shadow: 0 0 transparent;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 18px;
+    width: 90%;
+    text-align: left;
+}
+
+button.dialog div.caret {
+    margin: 8px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #000;
+    float: right;
+}
+
+body>div.dialog {
+    display: none;
+    position: fixed;
+    background: #fff;
+    top: 64px;
+    right: 32px;
+    bottom: 32px;
+    left: 32px;
+    overflow: auto;
+    z-index: 2;
+}
+
+#aeroDialogSelect>div {
+    padding: 16px;
+    border-bottom: 1px solid #ddd;
+}
+
+#matte {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+@media (min-width: 800px) {
+    body {
+        padding-left: 240px;
+    }
+
+    body>header {
+        padding-left: 16px;
+        left: 240px;
+    }
+
+    body>footer {
+        padding-left: 16px;
+        left: 240px;
+    }
+
+    /* body > header button {
+        display: none;
+    } */
+    body>nav#main {
+        width: 240px;
+    }
+
+    #matte {
+        z-index: 1;
+    }
+
+    body>article>section {
+        width: 48%;
+        margin: 1%;
+        box-sizing: border-box;
+    }
+}
