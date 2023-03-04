@@ -1,0 +1,202 @@
+/* Customize here */
+
+/* Main application header */
+body>header {
+    background: rgb(41, 41, 41);
+    color: #fff;
+}
+
+/* Hamburger menu lines */
+body>header button div {
+    background: #fff;
+}
+
+/* Menu title */
+body>nav#main h2 {
+    color: rgb(41, 41, 41);
+}
+
+/* Section headers */
+article>section>header {
+    background: rgb(41, 41, 41);
+}
+
+/* Article h1 - h6 */
+article>h1,
+article>h2,
+article>h3,
+article>h4,
+article>h5,
+article>h6 {
+    color: rgb(41, 41, 41);
+}
+
+/* Section h2 - h4 */
+article>section h2,
+article>section h3,
+article>section h4 {
+    color: rgb(41, 41, 41);
+}
+
+/* Dialog h2 - h4 */
+body>div.dialog h2,
+body>div.dialog h3,
+body>div.dialog h4 {
+    color: rgb(41, 41, 41);
+}
+
+/* Tab active */
+nav.tabs a.active {
+    border-bottom: 2px solid rgb(41, 41, 41);
+}
+
+img {
+    border-radius: 8px;
+    padding: 5px;
+    max-width: 100%;
+    height: auto;
+    float: right;
+}
+
+#logo {
+    border-radius: 8px;
+    padding: 5px;
+    max-width: 20%;
+    height: auto;
+}
+
+#footerVersion {
+    font-size: x-small;
+}
+
+[type="checkbox"] {
+    float: right;
+}
+
+.smallText {
+    margin-top: 0px;
+    margin-left: 0.5px;
+    font-size: x-small;
+}
+
+list_left {
+    /* max-width: 80%; */
+    float: left;
+    color: rgb(169, 169, 169);
+}
+
+list_right {
+    /* max-width: 20%; */
+    float: right;
+
+}
+
+section>div {
+    padding: 8px;
+    margin: 8px;
+}
+
+fieldset>div {
+    padding: 8px;
+    margin: 8px;
+}
+
+.not_valid_input {}
+
+input:invalid {
+    background-color: #ffdddd;
+}
+
+
+/* // ******* */
+
+.event {
+    border-radius: 4px;
+    color: #FFFFFF;
+    font-size: 12px;
+    margin: 5px 0px 10px 0px;
+    padding: 2px 0px;
+    float: right;
+}
+
+.event.listening {
+    background-color: #333333;
+    display: block;
+}
+
+.event.received {
+    background-color: #4B946A;
+    display: none;
+}
+
+#deviceready.ready .event.listening {
+    display: none;
+}
+
+#deviceready.ready .event.received {
+    display: block;
+}
+
+@keyframes fade {
+    from {
+        opacity: 1.0;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+
+    to {
+        opacity: 1.0;
+    }
+}
+
+.blink {
+    animation: fade 3000ms infinite;
+    -webkit-animation: fade 3000ms infinite;
+}
+
+/* connect button */
+#connectStartStop {
+    left: 80%;
+    top: 5.5px;
+    width: 80px;
+    height: 45px;
+    padding-top: 4px;
+
+    opacity: 0.7;
+    position: fixed;
+
+    font-size: 12px;
+    /* display: block; */
+
+
+    border-radius: 10px;
+    background-color: #c79111;
+    color: white;
+
+    text-align: center;
+    vertical-align: text-top;
+    /* float: right; */
+}
+
+/* progress bar */
+#printerProgress {
+    width: 100%;
+    background-color: #d9d9d9;
+    border-radius: 5px;
+    height: 10px;
+}
+
+#printerProgressBar {
+    width: 0%;
+    height: 10px;
+    border-radius: 5px;
+    margin-left: 0px;
+    background-color: green;
+}
+
+.animateValue {
+    transition-property: color;
+    transition-duration: 250ms;
+}

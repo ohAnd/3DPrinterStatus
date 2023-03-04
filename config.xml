@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.ohand.threeDPrinterStatus" version="0.0.1" android-versionCode="0205" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>3D Printer Status</name>
+    <description>A lightweight basic app for the status of your 3D rpinter.</description>
+    <author email="andreas@nicandi.com" href="https://github.com/ohAnd/3DPrinterStatus">
+        ohand
+    </author>
+    <icon src="www/img/logo2.jpg" />
+    <content src="index.html" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+
+    <plugin name="cordova-plugin-whitelist" spec="1" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+
+    <hook type="after_prepare" src="hooks/version_replace.js" />
+    <platform name="android">
+        <allow-intent href="market:*" />
+        <preference name="KeepRunning" value="true"/>
+        <!-- <hook type="after_build" src="hooks/copyAndReleaseBuild.js" /> -->
+        <!-- <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application"> 
+            <application android:usesCleartextTraffic="true" />
+        </edit-config> -->
+    </platform>
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+        <config-file parent="UIApplicationExitsOnSuspend" target="*-Info.plist">
+            <true />
+        </config-file>
+    </platform>
+</widget>
