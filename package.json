@@ -33,5 +33,8 @@
         "ANDROIDX_APPCOMPAT_VERSION": "1.3.1"
       }
     }
+  },
+  "dependencies": {
+    "xml2js": "^0.4.23"
   }
 }
