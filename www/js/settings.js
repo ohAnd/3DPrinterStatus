@@ -49,51 +49,65 @@ document.getElementById("appStarted").innerText = getTimestamp(true);
 // show sessionState
 let cacheSessionState = '';
 let cachesessionCheckCounter = '';
-let debugCheckSessionTimer
-function startCheckSession() {
-    debugCheckSessionTimer = setInterval(function () {
-        if (cacheSessionState != sessionState) {
-            addDebugEntryToLog("session changed - " + cacheSessionState + " -> " + sessionState);
-            cacheSessionState = sessionState;
-            document.getElementById("sessionState").innerText = sessionState;
-            if (sessionState == "established") {
-                document.getElementById("initiateConnection").parentElement.style.background = "#009445"; //green
-                global.info.settings.retryCnt = 0; // retry cnt 0, because session is successfully established
-            } else if (sessionState == "releasing") {
-                document.getElementById("initiateConnection").parentElement.style.background = "#10a4eb"; //lightblue
-            } else if (sessionState == "finished") {
-                document.getElementById("initiateConnection").parentElement.style.background = "#00cf5c"; //light green
-                if (baseConnection.active) { // retrigger session with increment of retry counter if user not closed the session
-                    global.info.settings.retryCnt = global.info.settings.retryCnt + 1;
-                    addDebugEntryToLog("session changed -> finished - starting retry no. " + global.info.settings.retryCnt, true, true, 'warn');
-                    if(global.info.settings.retryCnt > 19) {
-                        global.info.settings.retryCnt = 0;
-                    }
-                    startStopPrinterSession();
-                }
-            } else if (sessionState.startsWith("backgroundUpdate")) {
-                document.getElementById("initiateConnection").parentElement.style.background = "#d8e300"; // yellow
-            } else {
-                document.getElementById("initiateConnection").parentElement.style.background = "#e80b0b"; //red
-            }
-            // set state of baseConnection
-            document.getElementById("baseConnection").innerText = baseConnection.active;
-        }
-        notificationProgress(global.printerData.job.progress);
+let debugCheckSessionTimer = null;
 
-        if (cachesessionCheckCounter != sessionCheckCounter) {
-            cachesessionCheckCounter = sessionCheckCounter;
-            if (sessionCheckCounter % 30 == 0 && !global.appPaused) {
-                addDebugEntryToLog("sessionTimer FOREground -> " + sessionCheckCounter, true, true);
-            } else if (global.appPaused) {
-                addDebugEntryToLog("sessionTimer BACKground -> " + sessionCheckCounter, true, true);
+function startCheckSession() {
+    addDebugEntryToLog("startCheckSession - with setInterval - timerid: " + debugCheckSessionTimer);
+    if (debugCheckSessionTimer == null) { // only if timer cleared fully, then 
+        debugCheckSessionTimer = setInterval(function () {
+            if (cacheSessionState != sessionState) {
+                addDebugEntryToLog("session changed - " + cacheSessionState + " -> " + sessionState);
+                cacheSessionState = sessionState;
+                document.getElementById("sessionState").innerText = sessionState;
+                if (sessionState == "established") {
+                    document.getElementById("initiateConnection").parentElement.style.background = "#009445"; //green
+                    global.info.settings.retryCnt = 0; // retry cnt 0, because session is successfully established
+                } else if (sessionState == "releasing") {
+                    document.getElementById("initiateConnection").parentElement.style.background = "#10a4eb"; //lightblue
+                } else if (sessionState == "finished") {
+                    document.getElementById("initiateConnection").parentElement.style.background = "#00cf5c"; //light green
+                    startRetries(5, sessionState);
+                } else if (sessionState == "blocked") {
+                    document.getElementById("initiateConnection").parentElement.style.background = "#542d2d"; //brown
+                    startRetries(20, sessionState);
+                } else if (sessionState.startsWith("backgroundUpdate")) {
+                    document.getElementById("initiateConnection").parentElement.style.background = "#d8e300"; // yellow
+                } else {
+                    document.getElementById("initiateConnection").parentElement.style.background = "#e80b0b"; //red
+                }
+                // set state of baseConnection
+                document.getElementById("baseConnection").innerText = baseConnection.active;
             }
+            notificationProgress(global.printerData.job.progress);
+
+            if (cachesessionCheckCounter != sessionCheckCounter) {
+                cachesessionCheckCounter = sessionCheckCounter;
+                if (sessionCheckCounter % 30 == 0 && !global.appPaused) {
+                    addDebugEntryToLog("sessionTimer FOREground -> " + sessionCheckCounter, true, true);
+                } else if (global.appPaused) {
+                    addDebugEntryToLog("sessionTimer BACKground -> " + sessionCheckCounter, true, true);
+                }
+            }
+            if (!baseConnection.active) {
+                clearInterval(debugCheckSessionTimer);
+                debugCheckSessionTimer = null;
+                addDebugEntryToLog("sessionTimer Stopped", true, true);
+            }
+        }, 100);
+    }
+}
+
+function startRetries(retries, state = '') {
+    if (baseConnection.active) { // retrigger session with increment of retry counter if user not closed the session
+        global.info.settings.retryCnt = global.info.settings.retryCnt + 1;
+        if (global.info.settings.retryCnt > retries) {
+            global.info.settings.retryCnt = 0;
+        } else {
+            addDebugEntryToLog("session changed -> " + state + " - starting retry no. " + global.info.settings.retryCnt, true, true, 'warn');
         }
-        if (!baseConnection.active) {
-            clearInterval(debugCheckSessionTimer);
-            addDebugEntryToLog("sessionTimer Stopped", true, true);
-        }
-    }, 100);
+        // if retryCnt > 0 start new connection, else stop session
+        startStopPrinterSession();
+    }
 }
 
 // local notification
@@ -112,7 +126,8 @@ function notificationProgress(progressValue) {
                         smallIcon: 'res://info',
                         icon: 'res://img/3d-printing-icon.png',
                         progressBar: { value: progressValue },
-                        foreground: true
+                        foreground: true,
+                        sound: null
                     });
                 } catch (error) {
                     console.log("settings.js - Exception 'cordova module not found': catching notification for browser debugging: " + error.message);
@@ -128,6 +143,7 @@ function notificationProgress(progressValue) {
                             smallIcon: 'res://info',
                             icon: 'res://img/3d-printing-icon.png',
                             progressBar: { value: progressValue },
+                            sound: null
                         });
                     } catch (error) {
                         console.log("settings.js - Exception 'cordova module not found': catching notification for browser debugging: " + error.message);
