@@ -54,8 +54,8 @@ jobs:
           echo "cat ../buildnumber.txt"
           cat ${{ github.workspace }}/hooks/buildnumber.txt
           VERSIONNUMBER=`cat ${{ github.workspace }}/hooks/versionnumber.txt`
-          echo "cat ../buildnumber.txt"
-          cat ${{ github.workspace }}/hooks/buildnumber.txt
+          echo "cat ../hooks/versionnumber.txt"
+          cat ${{ github.workspace }}/hooks/hooks/versionnumber.txt
           echo "CURRENT_VERSIONNUMBER=$VERSIONNUMBER" >> $GITHUB_ENV
           echo "CURRENT_BUILDNUMBER=$BUILDNUMBER" >> $GITHUB_ENV
 
