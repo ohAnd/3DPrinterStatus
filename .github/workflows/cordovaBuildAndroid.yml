@@ -43,7 +43,7 @@ jobs:
             
       - name: write temp file for version/ build number
         run: |
-          rm ${{ github.workspace }}/hooks/buildnumber.txt
+#          rm ${{ github.workspace }}/hooks/buildnumber.txt
           touch ${{ github.workspace }}/hooks/buildnumber.txt
           printf -v BUILDNUMBER "%04ddev" ${{github.run_number}}
           echo $BUILDNUMBER >> ${{ github.workspace }}/hooks/buildnumber.txt
