@@ -8,23 +8,28 @@ var wwwFileToReplace = "js/global.js";
 var fs = require('fs');
 var path = require('path');
 
-
-
-
+// version number
 var configXMLPath = "config.xml";
 var rawJSON = loadConfigXMLDoc(configXMLPath);
 var version = rawJSON.widget.$.version;
-console.log("Version:", version);
+console.log(getDateTimeString() + " - " + "Got version:", version);
+// write to file as an interface for github action
 writeStringToFile(version,"hooks/versionnumber.txt");
 
-var buildnumber = parseInt(get_string_from_file("hooks/buildnumber.txt"));
-buildnumber = ("0000" + buildnumber).slice(-4);
-console.log("build number:", buildnumber);
+// buildnumber - get from file as an interface from github action or local build
+var buildnumberString = get_string_from_file("hooks/buildnumber.txt");
+var buildnumber = parseInt(buildnumberString);
+var devState = buildnumberString.split(buildnumber)[1];
+buildnumber = ("0000" + buildnumber).slice(-4) + devState;
+console.log(getDateTimeString() + " - " + "Got build number:", buildnumber);
 
+// version string
 let androidversion = version.split(".")[0] + "." + version.split(".")[1] + "." + version.split(".")[2] + "." + buildnumber;
+console.log(getDateTimeString() + " - " + "Summerized version:", androidversion);
 
+// builddate
 var builddate = getDateTimeString();
-console.log("Build Date:", builddate);
+console.log(getDateTimeString() + " - " + "Build Date:", builddate);
 
 replaceForFile(wwwFileToReplace);
 
@@ -36,14 +41,14 @@ function loadConfigXMLDoc(filePath) {
         var fileData = fs.readFileSync(filePath, 'ascii');
         var parser = new xml2js.Parser();
         parser.parseString(fileData.substring(0, fileData.length), function (err, result) {
-            //console.log("config.xml as JSON", JSON.stringify(result, null, 2));
+            //console.log(getDateTimeString() + " - " + "config.xml as JSON", JSON.stringify(result, null, 2));
             json = result;
         });
-        console.log("File '" + filePath + "' was successfully read.");
+        console.log(getDateTimeString() + " - " + "File '" + filePath + "' was successfully read.");
         return json;
     } catch (ex) {
 
-        console.log(ex)
+        console.log(getDateTimeString() + " - " + "error during loading config file (" + filePath + "): " + ex);
     }
 }
 
@@ -54,12 +59,21 @@ function replace_string_in_file(filename, to_replace, replace_with) {
 }
 
 function get_string_from_file(filename) {
-    var data = fs.readFileSync(filename, 'utf8');
-    return data;
+    try {
+        var data = fs.readFileSync(filename, 'utf8');
+        //cut last CR - caused by writing to file in bash
+        data = data.split("\r\n")[0];
+        console.log(getDateTimeString() + " - " + "File '" + filename + "' was successfully read.");
+        return data;
+    } catch (error) {
+        console.warn(getDateTimeString() + " - " + "error during loading config file (" + filename + "): " + error);
+    }
+
 }
 
 function writeStringToFile(str, filename) {
     fs.writeFileSync(filename, str, 'utf8');
+    console.log(getDateTimeString() + " - " + "File '" + filename + "' was successfully written - content: '" + str + "'");
 }
 
 function getDateTimeString() {
@@ -81,11 +95,11 @@ function getDateTimeString() {
     // let seconds = date_ob.getSeconds();
     let seconds = ("0" + date_ob.getSeconds()).slice(-2);
     // prints date in YYYY-MM-DD format
-    // console.log(year + "-" + month + "-" + date);
+    // console.log(getDateTimeString() + " - " + year + "-" + month + "-" + date);
     // prints date & time in YYYY-MM-DD HH:MM:SS format
     var datestimetring = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
     // prints time in HH:MM format
-    // console.log(hours + ":" + minutes);
+    // console.log(getDateTimeString() + " - " + hours + ":" + minutes);
 
     return datestimetring;
 }
@@ -97,7 +111,7 @@ function replaceForFile(wwwFileToReplace) {
         replace_string_in_file(fullfilename, "%%VERSION%%", version);
         replace_string_in_file(fullfilename, "%%BUILDNUMBER%%", androidversion);
         replace_string_in_file(fullfilename, "%%BUILDDATE%%", builddate);
-        console.log("Replaced version in file: " + fullfilename);
+        console.log(getDateTimeString() + " - " + "Replaced version in file: " + fullfilename);
     }
 
     wwwPath = "platforms/browser/www/"
@@ -106,7 +120,7 @@ function replaceForFile(wwwFileToReplace) {
         replace_string_in_file(fullfilename, "%%VERSION%%", version);
         replace_string_in_file(fullfilename, "%%BUILDNUMBER%%", androidversion);
         replace_string_in_file(fullfilename, "%%BUILDDATE%%", builddate);
-        console.log("Replaced version in file: " + fullfilename);
+        console.log(getDateTimeString() + " - " + "Replaced version in file: " + fullfilename);
     }
 
 }

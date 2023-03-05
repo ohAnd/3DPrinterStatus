@@ -66,6 +66,9 @@ function startCheckSession() {
                 if (baseConnection.active) { // retrigger session with increment of retry counter if user not closed the session
                     global.info.settings.retryCnt = global.info.settings.retryCnt + 1;
                     addDebugEntryToLog("session changed -> finished - starting retry no. " + global.info.settings.retryCnt, true, true, 'warn');
+                    if(global.info.settings.retryCnt > 19) {
+                        global.info.settings.retryCnt = 0;
+                    }
                     startStopPrinterSession();
                 }
             } else if (sessionState.startsWith("backgroundUpdate")) {
