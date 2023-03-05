@@ -23,7 +23,7 @@
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="KeepRunning" value="true"/>
-        <!-- <hook type="after_build" src="hooks/copyAndReleaseBuild.js" /> -->
+        <hook type="after_build" src="hooks/copyAndReleaseBuild.js" />
         <!-- <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application"> 
             <application android:usesCleartextTraffic="true" />
         </edit-config> -->
