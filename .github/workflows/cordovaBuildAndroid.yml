@@ -62,7 +62,7 @@ jobs:
         run: |
           VERSIONNUMBER=`cat ${{ github.workspace }}/hooks/versionnumber.txt`
           echo "cat ../hooks/versionnumber.txt"
-          cat ${{ github.workspace }}/hooks/hooks/versionnumber.txt
+          cat ${{ github.workspace }}/hooks/versionnumber.txt
           echo "CURRENT_VERSIONNUMBER=$VERSIONNUMBER" >> $GITHUB_ENV
         
       - name: Upload dev APK

@@ -12,7 +12,7 @@ var path = require('path');
 var configXMLPath = "config.xml";
 var rawJSON = loadConfigXMLDoc(configXMLPath);
 var version = rawJSON.widget.$.version;
-console.log(getDateTimeString() + " - " + "Version:", version);
+console.log(getDateTimeString() + " - " + "Got version:", version);
 // write to file as an interface for github action
 writeStringToFile(version,"hooks/versionnumber.txt");
 
@@ -21,11 +21,11 @@ var buildnumberString = get_string_from_file("hooks/buildnumber.txt");
 var buildnumber = parseInt(buildnumberString);
 var devState = buildnumberString.split(buildnumber)[1];
 buildnumber = ("0000" + buildnumber).slice(-4) + devState;
-console.log(getDateTimeString() + " - " + "build number:", buildnumber);
+console.log(getDateTimeString() + " - " + "Got build number:", buildnumber);
 
 // version string
 let androidversion = version.split(".")[0] + "." + version.split(".")[1] + "." + version.split(".")[2] + "." + buildnumber;
-console.log(getDateTimeString() + " - " + "summerized version:", androidversion);
+console.log(getDateTimeString() + " - " + "Summerized version:", androidversion);
 
 // builddate
 var builddate = getDateTimeString();
@@ -73,6 +73,7 @@ function get_string_from_file(filename) {
 
 function writeStringToFile(str, filename) {
     fs.writeFileSync(filename, str, 'utf8');
+    console.log(getDateTimeString() + " - " + "File '" + filename + "' was successfully written - content: '" + str + "'");
 }
 
 function getDateTimeString() {
