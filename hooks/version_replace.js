@@ -62,7 +62,8 @@ function get_string_from_file(filename) {
     try {
         var data = fs.readFileSync(filename, 'utf8');
         //cut last CR - caused by writing to file in bash
-        data = data.split("\r\n")[0];
+        // data = data.split("\r\n")[0];
+        data = data.replace(/^\s+|\s+$/g, '');
         console.log(getDateTimeString() + " - " + "File '" + filename + "' was successfully read.");
         return data;
     } catch (error) {
