@@ -1,8 +1,8 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
-labels: ''
+title: "[FEATURE] <short summery of the feature request>"
+labels: content, good first issue, UX
 assignees: ''
 
 ---
