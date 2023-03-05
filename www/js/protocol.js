@@ -94,7 +94,7 @@ function reactOnCmdsFromPrinter(responseCommand, responseString) {
 
 // session handling
 let sessionState = '';
-let sessionCheckTimmer = '';
+let sessionCheckTimmer = null;
 
 function sessionStart() {
     sessionState = "initiated";
@@ -106,50 +106,57 @@ function sessionStart() {
 let lastState = '';
 let sessionCheckCounter = 0;
 function sessionCheck(printerSocket) {
-    sessionCheckTimmer = setInterval(function () {
-        let socketState = getSocketState(printerSocket);
-        // checkAndSwitchInBackgroundMode(printerSocket);
-        // 1st layer
-        if (socketState == "OPENED") {
-            // 2nd layer
-            if (sessionState == 'established') {
-                if ((sessionCheckCounter % 2) == 0) {
-                    printerGetTemp(printerSocket);
-                    printerHeadPositions(printerSocket);
+    if (sessionCheckTimmer == null) {
+        sessionCheckTimmer = setInterval(function () {
+            let socketState = getSocketState(printerSocket);
+            // checkAndSwitchInBackgroundMode(printerSocket);
+            // 1st layer
+            if (socketState == "OPENED") {
+                // 2nd layer
+                if (sessionState == 'established') {
+                    if ((sessionCheckCounter % 2) == 0) {
+                        printerGetTemp(printerSocket);
+                        printerHeadPositions(printerSocket);
+                    }
+                    if ((sessionCheckCounter % 3) == 0) {
+                        printerGetProgress(printerSocket);
+                        addEntryToLog("sessionCheck printerGetProgress - cnt: " + sessionCheckCounter, true, true, 'warn');
+                    }
+                    if ((sessionCheckCounter % 11) == 0) {
+                        printerGetStatus(printerSocket);
+                        addEntryToLog("sessionCheck printerGetStatus - cnt: " + sessionCheckCounter, true, true, 'warn');
+                    }
+                    if ((sessionCheckCounter % 15) == 0) {
+                        printerGetInfo(printerSocket);
+                        addEntryToLog("sessionCheck printerGetInfo - cnt: " + sessionCheckCounter, true, true, 'warn');
+                    }
+                } else if (sessionState == 'blocked') {
+                    addEntryToLog("sessionCheck at state " + sessionState + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
+                    stopSessionTimer(sessionCheckTimmer);
+                    // start retry
+                } else if (sessionState == 'socketError') {
+                    // start retry
+                } else if (sessionState == 'closed') {
+                    addEntryToLog("sessionCheck at state " + sessionState + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
+                    stopSessionTimer(sessionCheckTimmer);
+                } else if (sessionState == 'released' || sessionState == 'releasing') {
+                    addEntryToLog("sessionCheck at state " + sessionState + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
+                    stopSessionTimer(sessionCheckTimmer);
+                } else { // 
+                    addEntryToLog("sessionCheck at state " + sessionState + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
+                    stopSessionTimer(sessionCheckTimmer);
                 }
-                if ((sessionCheckCounter % 3) == 0) {
-                    printerGetProgress(printerSocket);
-                    addEntryToLog("sessionCheck printerGetProgress - cnt: " + sessionCheckCounter, true, true, 'warn');
-                }
-                if ((sessionCheckCounter % 11) == 0) {
-                    printerGetStatus(printerSocket);
-                    addEntryToLog("sessionCheck printerGetStatus - cnt: " + sessionCheckCounter, true, true, 'warn');
-                }
-                if ((sessionCheckCounter % 15) == 0) {
-                    printerGetInfo(printerSocket);
-                    addEntryToLog("sessionCheck printerGetInfo, - cnt: " + sessionCheckCounter, true, true, 'warn');
-                }
-            } else if (sessionState == 'blocked') {
+            } else if (socketState == "CLOSED") {
                 // start retry
-            } else if (sessionState == 'socketError') {
-                // start retry
-            } else if (sessionState == 'closed') {
-                clearInterval(sessionCheckTimmer);
-            } else if (sessionState == 'released' || sessionState == 'releasing') {
-                clearInterval(sessionCheckTimmer);
-            } else { // 
-                clearInterval(sessionCheckTimmer);
+                sessionState = "finished";
+                stopSessionTimer(sessionCheckTimmer);
             }
-        } else if (socketState == "CLOSED") {
-            // start retry
-            sessionState = "finished";
-            clearInterval(sessionCheckTimmer);
-        }
-        lastState = sessionState;
-        sessionCheckCounter++;
-        document.getElementById("refreshTimer").innerText = sessionCheckCounter;
-        if (sessionCheckCounter >= 60) { sessionCheckCounter = 0; }
-    }, 1000);
+            lastState = sessionState;
+            sessionCheckCounter++;
+            document.getElementById("refreshTimer").innerText = sessionCheckCounter;
+            if (sessionCheckCounter >= 60) { sessionCheckCounter = 0; }
+        }, 1000);
+    }
 }
 
 function sessionStop(printerSocket, targetState = 'releasing') {
@@ -158,13 +165,18 @@ function sessionStop(printerSocket, targetState = 'releasing') {
     printerControlEnd(printerSocket);
 }
 
+function stopSessionTimer(timerVar) {
+    clearInterval(timerVar);
+    sessionCheckTimmer = null;
+}
+
 // *** limitited network update in background needed
 // pause the regular data update
 function checkAndSwitchInBackgroundMode(printerSocket) {
     if (baseConnection.active) {
         if (global.appPaused && (getSocketState(printerSocket)) == "OPENED") {
             sessionStop(printerSocket, "backgroundUpdateIdle");
-        } else if((getSocketState(printerSocket)) != "OPENED") {
+        } else if ((getSocketState(printerSocket)) != "OPENED") {
             printerSocket = sessionStart();
         }
     }

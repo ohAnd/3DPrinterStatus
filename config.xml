@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ohand.threeDPrinterStatus" version="0.0.2" android-versionCode="0205" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ohand.threeDPrinterStatus" version="0.0.3" android-versionCode="0205" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>3D Printer Status</name>
     <description>A lightweight basic app for the status of your 3D rpinter.</description>
     <author email="andreas@nicandi.com" href="https://github.com/ohAnd/3DPrinterStatus">
