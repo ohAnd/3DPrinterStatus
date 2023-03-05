@@ -40,11 +40,7 @@ jobs:
             mv d8 dx
             cd lib
             mv d8.jar dx.jar
-
-      - name: Add Android platform
-        run : |
-          cordova platform add android
-
+            
       - name: write temp file for version/ build number
         run: |
           rm ${{ github.workspace }}/hooks/buildnumber.txt
@@ -58,6 +54,10 @@ jobs:
           cat ${{ github.workspace }}/hooks/hooks/versionnumber.txt
           echo "CURRENT_VERSIONNUMBER=$VERSIONNUMBER" >> $GITHUB_ENV
           echo "CURRENT_BUILDNUMBER=$BUILDNUMBER" >> $GITHUB_ENV
+
+      - name: Add Android platform
+        run : |
+          cordova platform add android
 
       - name: Build Android Dev APK
         run: |
