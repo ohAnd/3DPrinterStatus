@@ -12,6 +12,7 @@
   - [screenshots](#screenshots)
   - [features planned/ done](#features-planned-done)
   - [info](#info)
+  - [licenses](#licenses)
 
 ## description
 ### pre notice
@@ -83,3 +84,6 @@ you can raise a feture or bug reqest here and also use this information
 ## info
 - current usage (at least until 0.0.1.0172) of connect/ disconnect button colors -> orange = is initialized / green = is connected / red = error occured (check debug log, e.g. BLOCKED means PC has already active connection to printer)/ blue = session releasing or finished
 - "Bresser REX" offer itself as a "Flashforge Adventurer III"
+
+## licenses
+logo was taken from here [Image by macrovector](https://www.freepik.com/free-vector/3d-printing-icons-set_4358644.htm#query=3d%20printer&position=1&from_view=keyword&track=ais") on Freepik
