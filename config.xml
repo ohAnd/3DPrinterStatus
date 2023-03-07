@@ -27,11 +27,12 @@
         <!-- <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application"> 
             <application android:usesCleartextTraffic="true" />
         </edit-config> -->
-        <icon background="res/icon/android/mdpi_background.png" density="mdpi" foreground="res/icon/android/mdpi_foreground.png" />
-        <icon background="res/icon/android/hdpi_background.png" density="hdpi" foreground="res/icon/android/hdpi_foreground.png" />
-        <icon background="res/icon/android/xhdpi_background.png" density="xhdpi" foreground="res/icon/android/xhdpi_foreground.png" />
-        <icon background="res/icon/android/xxhdpi_background.png" density="xxhdpi" foreground="res/icon/android/xxhdpi_foreground.png" />
-        <icon background="res/icon/android/xxxhdpi_background.png" density="xxxhdpi" foreground="res/icon/android/xxxhdpi_foreground.png" />
+        <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/ic_launcher_background.xml" />
+        <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xhdpi" foreground="res/icon/android/mipmap-xhdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xxhdpi" foreground="res/icon/android/mipmap-xxhdpi/ic_launcher_foreground.png" />
+        <icon background="@color/ic_launcher_background" density="xxxhdpi" foreground="res/icon/android/mipmap-xxxhdpi/ic_launcher_foreground.png" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
