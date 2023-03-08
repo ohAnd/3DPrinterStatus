@@ -27,6 +27,7 @@
         <!-- <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application"> 
             <application android:usesCleartextTraffic="true" />
         </edit-config> -->
+        <preference name="AndroidLaunchMode" value="singleInstance"/>
         <resource-file src="res/icon/android/values/ic_launcher_background.xml" target="/app/src/main/res/values/ic_launcher_background.xml" />
         <icon background="@color/ic_launcher_background" density="mdpi" foreground="res/icon/android/mipmap-mdpi/ic_launcher_foreground.png" />
         <icon background="@color/ic_launcher_background" density="hdpi" foreground="res/icon/android/mipmap-hdpi/ic_launcher_foreground.png" />
