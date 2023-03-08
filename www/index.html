@@ -46,7 +46,7 @@
             </p>
             <p style="text-align: center;">short workaround ;-) <a id="printerVideoLink" href="">click_me</a></p>
         </section>
-        <section>
+        <section id="debugWindowStartscreen" style="display:none;">
             <div>debug</div>
             <div>
                 <list_left>app started:</list_left>
@@ -190,51 +190,6 @@
 
             </footer> -->
         </section>
-        <!-- <section>
-            <header>
-                <h3>Section Header H3</h3>
-            </header>
-
-            <p>Aerophane does not use copious classes to connect styles to HTML elements. Elements acquire their styling
-                based on their position in the document. For example, the <code>&lt;article&gt;</code> tag is the basic
-                container, a <code>&lt;section&gt;</code>` element inside an article is displayed in a "card" style, and
-                a <code>&lt;header&gt;</code>` inside a section card looks like the blue space above. Check the source
-                code of the examples for specifics.
-        </section>
-
-        <section>
-            <header>
-                <h4>Section Header H4</h4>
-            </header>
-            <p>Aerophane comes with a few common UI features, most notably, a <button id="exampleDialog">dialog</button>
-            <p>Once you initialize the Aerophane object, you have access to a few other JavaScript utility functions
-                including:
-
-            <h4>forEachElement</h4>
-            <p>The JavaScript forEach array method doesn't work on element collections, so I find his handy to avoid
-                writing for loops.
-            <pre>aero.forEachElement(<em>elementCollection</em>, <em>elementFunction</em>);</pre>
-
-            <h4>classname</h4>
-            <p>Another utility function that Aerophane adds that would be completely unnecessary if you are using jQuery
-                is a method to work with class attributes.
-            <pre>aero.classname.add(<em>element</em>, <em>classname</em>);
-    aero.classname.remove(<em>element</em>, <em>classname</em>);
-    </pre>
-
-            <h4>touchclick</h4>
-            <p>A simple hack to remove some of the unnecessary sluggishness of hybrid mobile is to replace the
-                JavaScript <code>onclick</code> event handler with <code>ontouchstart</code>. The
-                <code>aero.touchclick</code> method event will do this while falling back to click on none-touch
-                interfaces.</p>
-        </section>
-
-        <section>
-            <h2>Modular File Structure</h2>
-            <p>Each screen is a separate HTML page in its own folder. Files unique to the page - CSS, JavaScript, images
-                - are contained in that folder. Application-wide files should be placed in the <code>inc</code> folder.
-        </section> -->
-        <!-- <div></div> -->
         <footer>
             <!-- <p>&copy; 2023 3DprinterState</p> -->
         </footer>
@@ -350,61 +305,16 @@
                     <p class="smallText">e.g. http://192.168.0.1:8080/?action=stream</p>
                 </label>
 
-
-
-                <!-- <label>Password</label>
-                <input type="password"> -->
-
-
-
-                <!-- <h2>Radio Buttons (h2 form)</h2>
-                <label class="radio"><input name="gender" type="radio" checked="checked"> Default</label>
-                <label class="radio"><input name="gender" type="radio"> Yes</label>
-                <label class="radio"><input name="gender" type="radio"> No</label> -->
-
-                <!-- <label>Select</label>
-                <select class="aeroSelect">
-                    <option selected="selected">Select your continent
-                    <option>Asia
-                    <option>Africa
-                    <option>Europe
-                    <option>North America
-                    <option>South America
-                    <option>Australia
-                    <option>Antarctica
-                </select> -->
-
             </fieldset>
             <hr>
             <fieldset>
                 <legend>appearance</legend>
+                <label>debug window in startscreen <input id="global.info.settings.debugWindowStartscreen" class="storageValue"
+                        type="checkbox"></label>
+                <p class="smallText">shows a debugscreen with info for connection state</p>
                 <label>dark mode (invert colors) <input id="global.info.settings.isDarkModeOn" class="storageValue"
                         type="checkbox"></label>
                 <p class="smallText">@todo - has to be developed</p>
-
-                <!-- <label>background color
-                <input type="color"></label> -->
-
-                <!-- <label>email</label>
-                <input type="email">
-
-                <label>date</label>
-                <input type="date">
-
-                <label>datetime-local</label>
-                <input type="datetime-local">
-
-                <label>file</label>
-                <input type="file">
-
-                <label>number</label>
-                <input type="number">
-
-                <label>range</label>
-                <input type="range">
-
-                <label>search</label>
-                <input type="search"> -->
 
             </fieldset>
             <hr>
@@ -420,7 +330,8 @@
                 <div>
                     <list_left>development branch</list_left>
                     <list_right>
-                        <a href="https://github.com/ohAnd/3DPrinterStatus/actions/workflows/cordovaBuildAndroid.yml">dev builds</a>
+                        <a href="https://github.com/ohAnd/3DPrinterStatus/actions/workflows/cordovaBuildAndroid.yml">dev
+                            builds</a>
                     </list_right>
                 </div>
                 <div></div>

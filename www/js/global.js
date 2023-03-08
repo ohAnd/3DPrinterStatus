@@ -19,6 +19,7 @@ global.info.settings = {};
 global.info.settings.holdConnectionOn = 0;
 global.info.settings.isDarkModeOn = 0;
 global.info.settings.retryCnt = 0;
+global.info.settings.debugWindowStartscreen = 0;
 
 global.info.notifications = {};
 global.info.notifications.on = true;
@@ -203,6 +204,14 @@ function updateValuesFromGlobal() {
                         document.getElementById("printerIPadressStandardEntry").style.display = "";
                     }
                 }
+                //switch visbility
+                if(element.id == "global.info.settings.debugWindowStartscreen") {
+                    if(valueFromGlobal == 1) {
+                        document.getElementById("debugWindowStartscreen").style.display = "";
+                    } else {
+                        document.getElementById("debugWindowStartscreen").style.display = "none";
+                    }
+                }
             } else {
                 elemValueType = 'value';
             }
@@ -210,7 +219,6 @@ function updateValuesFromGlobal() {
             elemValueType = 'innerText';
         }
         if (element[elemValueType] != valueFromGlobal && element.type != "checkbox") {
-            // console.log("global.js (updateValuesFromGlobal) - to elements (type: " + elemValueType + ") - id: " + element.id + " with old element value: '" + element.innerText + "' to new element value: '" + valueFromGlobal + "'");
             element[elemValueType] = valueFromGlobal;
         }
         // console.log("got update -> " + element.value);
