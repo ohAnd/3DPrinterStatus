@@ -12,7 +12,7 @@ var aero;
 
     aero = new Aerophane(global.info.appname, [
         { "name": "Home", "id": "home" }, //"../home/home.html" },
-        { "name": "3D print templates", "id": "templates" }, //"../list/list.html" },
+        { "name": "3D print infos", "id": "templates" }, //"../list/list.html" },
         // { "name": "Search", "href": "../search/search.html" },
         { "name": "Settings", "id": "settings" } //"../settings/settings.html" }
     ], function () {
