@@ -86,4 +86,5 @@ you can raise a feture or bug reqest here and also use this information
 - "Bresser REX" offer itself as a "Flashforge Adventurer III"
 
 ## licenses
-logo was taken from here [Image by macrovector](https://www.freepik.com/free-vector/3d-printing-icons-set_4358644.htm#query=3d%20printer&position=1&from_view=keyword&track=ais") on Freepik
+- logo was taken from here [Image by macrovector](https://www.freepik.com/free-vector/3d-printing-icons-set_4358644.htm#query=3d%20printer&position=1&from_view=keyword&track=ais") on Freepik
+- ui template/ javascript based on https://github.com/chrisbroski/aerophane

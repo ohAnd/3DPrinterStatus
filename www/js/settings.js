@@ -143,7 +143,8 @@ function notificationProgress(progressValue) {
                             smallIcon: 'res://info',
                             icon: 'res://img/3d-printing-icon.png',
                             progressBar: { value: progressValue },
-                            sound: null
+                            sound: null,
+                            foreground: false
                         });
                     } catch (error) {
                         console.log("settings.js - Exception 'cordova module not found': catching notification for browser debugging: " + error.message);
@@ -151,7 +152,7 @@ function notificationProgress(progressValue) {
                 }
                 // once notification every 10 % and at the end
                 if (cacheProgress != global.printerData.job.progress) {
-                    if ((progressValue % 10) == 0 || progressValue >= 99) {
+                    if (((progressValue % 10) == 0 && progressValue != 0) || progressValue >= 99) {
                         let titleVar = '3D printing running';
                         let textVar = 'current progress: ' + progressValue + " %";
                         if (progressValue >= 99) {
