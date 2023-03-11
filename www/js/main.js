@@ -11,16 +11,15 @@ var aero;
     }
 
     aero = new Aerophane(global.info.appname, [
-        { "name": "Home", "id": "home" }, //"../home/home.html" },
-        { "name": "3D print infos", "id": "templates" }, //"../list/list.html" },
-        // { "name": "Search", "href": "../search/search.html" },
-        { "name": "Settings", "id": "settings" } //"../settings/settings.html" }
+        { "name": "Home", "id": "home" },
+        { "name": "3D print infos", "id": "templates" },
+        { "name": "Settings", "id": "settings" }
     ], function () {
         console.log("after new Aerophane and ready")
         global.isDeviceReady = true;
 
-        onDeviceReady();
         cordova.plugins.notification.local.setDummyNotifications();
+        onDeviceReady();
         configureBackgroundMode();
 
     });
@@ -37,20 +36,56 @@ function onDeviceReady() {
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
 
-    // document.addEventListener("pause", eventAppPausedCall, false);
-    // function eventAppPausedCall() {
-    //     global.appPaused = true;
-    //     global.appResumed = false;
-    //     addDebugEntryToLog("event - app paused (putted into background)");
-    // }
-    // document.addEventListener("resume", eventAppResumedCall, false);
-    // function eventAppResumedCall() {
-    //     global.appPaused = false;
-    //     global.appResumed = true;
-    //     addDebugEntryToLog("event - app resume (returned from background)");
-    // }
+    console.log(cordova.plugins.notification.local.launchDetails);
 
-    //cancel possible existing progress notification
+    let testTimer = '';
+
+    document.addEventListener("pause", eventAppPausedCall, false);
+    function eventAppPausedCall() {
+        global.appPaused = true;
+        global.appResumed = false;
+        addDebugEntryToLog("event - app paused (putted into background)");
+
+        cordova.plugins.notification.local.schedule({
+            id: 42,
+            text: "background update started",
+            foreground: false,
+            sound: false
+        });
+        cordova.plugins.notification.local.on('trigger', function(notification) {
+            addDebugEntryToLog("update notification trigger: " + notification.id);
+        });
+        addDebugEntryToLog("starting testTimer: " + testTimer);
+        testTimer = setInterval( function () {
+            addDebugEntryToLog("testTimer triggered: " + testTimer);
+            cordova.plugins.notification.local.update({
+                id: 42,
+                text: "background update triggered",
+                foreground: false,
+                sound: false
+            });
+        }, 60000);
+    }
+
+
+    cordova.plugins.notification.local.on('trigger', (notification) => { // do something with notification
+        addDebugEntryToLog("update notification trigger: " + notification.id);
+    });
+
+    document.addEventListener("resume", eventAppResumedCall, false);
+    function eventAppResumedCall() {
+        global.appPaused = false;
+        global.appResumed = true;
+        addDebugEntryToLog("event - app resume (returned from background)");
+
+        clearInterval(testTimer);
+
+        cordova.plugins.notification.local.clear(42, function () {
+            addDebugEntryToLog("update notification cleared");
+        });
+    }
+
+    // cancel possible existing progress notification
     cordova.plugins.notification.local.clear(global.info.notifications.progressID, function () {
         addDebugEntryToLog("onDeviceReady - notification progress cleared");
     });
@@ -66,8 +101,8 @@ function configureBackgroundMode() {
     //     // hidden: Boolean,
     //     // bigText: Boolean
     // });
-    cordova.plugins.backgroundMode.overrideBackButton();
-    cordova.plugins.backgroundMode.enable();
+    // cordova.plugins.backgroundMode.overrideBackButton();
+    // cordova.plugins.backgroundMode.enable();
 
     // // if "hw" back button is pressed - go to "home" - first page
     // document.addEventListener("backbutton", onBackKeyDown, false);
@@ -83,32 +118,32 @@ function configureBackgroundMode() {
     //     }
     // }
 
-    cordova.plugins.backgroundMode.onfailure = function(errorCode){
-        addEntryToLog("backgroundMode - failed : " + errorCode, consoleDebug);
-    };
-    
+    // cordova.plugins.backgroundMode.onfailure = function(errorCode){
+    //     addEntryToLog("backgroundMode - failed : " + errorCode, consoleDebug);
+    // };
+
 
     // react on event
-    let backgroundModeTimer = '';
-    let backgroundSocket = '';
-    cordova.plugins.backgroundMode.on('activate', function () {
-        global.appPaused = true;
-        global.appResumed = false;
-        addEntryToLog(".backgroundMode.on('activate') - " + sessionState, consoleDebug);
-        // backgroundModeTimer = setInterval(function () {
-        //     if (baseConnection.active) {
-        //         sessionState = "backgroundUpdateStarting";
-        //         backgroundSocket = startConnection();
-        //     }
-        // }, 5000);
-    });
+    // let backgroundModeTimer = '';
+    // let backgroundSocket = '';
+    // cordova.plugins.backgroundMode.on('activate', function () {
+    //     global.appPaused = true;
+    //     global.appResumed = false;
+    //     addEntryToLog(".backgroundMode.on('activate') - " + sessionState, consoleDebug);
+    //     // backgroundModeTimer = setInterval(function () {
+    //     //     if (baseConnection.active) {
+    //     //         sessionState = "backgroundUpdateStarting";
+    //     //         backgroundSocket = startConnection();
+    //     //     }
+    //     // }, 5000);
+    // });
 
-    cordova.plugins.backgroundMode.on('deactivate', function () {
-        global.appPaused = false;
-        global.appResumed = true;
-        addEntryToLog(".backgroundMode.on('deactivate') - " + sessionState, consoleDebug);
-        clearInterval(backgroundModeTimer);
-    });
+    // cordova.plugins.backgroundMode.on('deactivate', function () {
+    //     global.appPaused = false;
+    //     global.appResumed = true;
+    //     addEntryToLog(".backgroundMode.on('deactivate') - " + sessionState, consoleDebug);
+    //     clearInterval(backgroundModeTimer);
+    // });
 }
 
 function createCommonFooter() {

@@ -270,18 +270,6 @@ aero.touchclick(document.getElementById("testTCPConnectionStart"), function () {
 
             printerSocket = startConnection();
 
-            // try {
-            //     cordova.plugins.notification.local.schedule({
-            //         title: 'test connection initiated',
-            //         text: 'please check the log in the settings detail view',
-            //         smallIcon: 'res://info',
-            //         icon: 'res://img/3d-printing-icon.png',
-            //         foreground: true
-            //     });
-            // } catch (error) {
-            //     console.log("settings.js - Exception 'cordova module not found': catching notification for browser debugging: " + error.message);
-            // }
-
             testConnection.active = true;
         } else {
             addEntryToLog("could not start test connection - base connection is still active", consoleDebug);
