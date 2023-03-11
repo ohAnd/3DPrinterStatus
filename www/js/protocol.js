@@ -32,24 +32,19 @@ const request_G91 = '~G91\r\n'        // CMD G91 Received.\r\nok\r\n
 
 var BUFFER_SIZE = 1024
 
+
+const session = {};
+session.state = 'booted';
+session.checkTimer = null;
+session.lastError = 'none';
+
 // global socket
 let printerSocket = '';
 
-// let teststr = "CMD M115 Received.\r\n"+
-// "Machine Type: FlashForge Adventurer III\r\n"+
-// "Machine Name: 3D-Drucker25141\r\n"+
-// "Firmware: v2.2.18889\r\n"+
-// "SN: SNFFAD263858\r\n"+
-// "X: 150 Y: 150 Z: 150\r\n"+
-// "Tool Count: 1\r\n"+
-// "Mac Address: 88:A9:A7:91:AC:12\r\n"+
-// "\r\n"+
-// "ok\r\n";
-// console.log("protocol.js - str orig: " + teststr);
-// let responseString = teststr.replace(/(\r\n|\r|\n)/g, ";");
-// console.log("protocol.js - str replace: " + responseString);
 
-// global.printerData.info = decodeStatus(responseString);
+// subscribe event for change of session state
+// TODO
+
 
 // protocol handling
 
@@ -64,7 +59,7 @@ function reactOnCmdsFromPrinter(responseCommand, responseString) {
             global.printerData.status = decodeStatus(responseString);
             if (global.appPaused) {
                 addEntryToLog("protocol.js - reactOnCmdsFromPrinter BackGround - got: request_status_message: " + responseString, consoleDebug);
-                sessionState = "backgroundUpdateGetProgress";
+                session.state = "backgroundUpdateGetProgress";
                 printerGetProgress(backgroundSocket);
             }
             break;
@@ -77,7 +72,7 @@ function reactOnCmdsFromPrinter(responseCommand, responseString) {
             global.printerData.job = decodeProgress(responseString);
             if (global.appPaused) {
                 addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_progress: " + responseString, consoleDebug);
-                sessionState = "backgroundUpdateControlEnd";
+                session.state = "backgroundUpdateControlEnd";
                 printerControlEnd(backgroundSocket);
             }
             break;
@@ -92,12 +87,8 @@ function reactOnCmdsFromPrinter(responseCommand, responseString) {
     return true;
 }
 
-// session handling
-let sessionState = '';
-let sessionCheckTimmer = null;
-
 function sessionStart() {
-    sessionState = "initiated";
+    session.state = "initiated";
     let socket = startConnection();
     sessionCheck(socket);
     return socket;
@@ -106,14 +97,14 @@ function sessionStart() {
 let lastState = '';
 let sessionCheckCounter = 0;
 function sessionCheck(printerSocket) {
-    if (sessionCheckTimmer == null) {
-        sessionCheckTimmer = setInterval(function () {
+    if (session.checkTimer == null) {
+        session.checkTimer = setInterval(function () {
             let socketState = getSocketState(printerSocket);
             // checkAndSwitchInBackgroundMode(printerSocket);
             // 1st layer
             if (socketState == "OPENED") {
                 // 2nd layer
-                if (sessionState == 'established') {
+                if (session.state == 'established') {
                     if ((sessionCheckCounter % 2) == 0) {
                         printerGetTemp(printerSocket);
                         printerHeadPositions(printerSocket);
@@ -130,28 +121,28 @@ function sessionCheck(printerSocket) {
                         printerGetInfo(printerSocket);
                         addEntryToLog("sessionCheck printerGetInfo - cnt: " + sessionCheckCounter, true, true, 'warn');
                     }
-                } else if (sessionState == 'blocked') {
-                    addEntryToLog("sessionCheck at state " + sessionState + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
-                    stopSessionTimer(sessionCheckTimmer);
+                } else if (session.state == 'blocked') {
+                    addEntryToLog("sessionCheck at state " + session.state + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
+                    stopSessionTimer(session.checkTimer);
                     // start retry
-                } else if (sessionState == 'socketError') {
+                } else if (session.state == 'socketError') {
                     // start retry
-                } else if (sessionState == 'closed') {
-                    addEntryToLog("sessionCheck at state " + sessionState + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
-                    stopSessionTimer(sessionCheckTimmer);
-                } else if (sessionState == 'released' || sessionState == 'releasing') {
-                    addEntryToLog("sessionCheck at state " + sessionState + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
-                    stopSessionTimer(sessionCheckTimmer);
+                } else if (session.state == 'closed') {
+                    addEntryToLog("sessionCheck at state " + session.state + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
+                    stopSessionTimer(session.checkTimer);
+                } else if (session.state == 'released' || session.state == 'releasing') {
+                    addEntryToLog("sessionCheck at state " + session.state + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
+                    stopSessionTimer(session.checkTimer);
                 } else { // 
-                    addEntryToLog("sessionCheck at state " + sessionState + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
-                    stopSessionTimer(sessionCheckTimmer);
+                    addEntryToLog("sessionCheck at state " + session.state + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
+                    stopSessionTimer(session.checkTimer);
                 }
             } else if (socketState == "CLOSED") {
                 // start retry
-                sessionState = "finished";
-                stopSessionTimer(sessionCheckTimmer);
+                session.state = "finished";
+                stopSessionTimer(session.checkTimer);
             }
-            lastState = sessionState;
+            lastState = session.state;
             sessionCheckCounter++;
             document.getElementById("refreshTimer").innerText = sessionCheckCounter;
             if (sessionCheckCounter >= 60) { sessionCheckCounter = 0; }
@@ -160,14 +151,14 @@ function sessionCheck(printerSocket) {
 }
 
 function sessionStop(printerSocket, targetState = 'releasing') {
-    sessionState = targetState;
-    addEntryToLog("protocol.js (sessionStop) - state: " + sessionState, consoleDebug);
+    session.state = targetState;
+    addEntryToLog("protocol.js (sessionStop) - state: " + session.state, consoleDebug);
     printerControlEnd(printerSocket);
 }
 
 function stopSessionTimer(timerVar) {
     clearInterval(timerVar);
-    sessionCheckTimmer = null;
+    session.checkTimer = null;
 }
 
 // *** limitited network update in background needed
@@ -209,26 +200,27 @@ function startConnection() {
                 case "CMD M601": // got control for printer
                     // CMD M601 Received.;Control Success.;ok;
                     if (responseString.split(";")[1] == "Control Success.") {
-                        sessionState = "established";
+                        session.state = "established";
                         addEntryToLog("protocol.js - onData - got: GotControl: " + responseString, consoleDebug);
                         // if backgorund mode
                         if (global.appPaused) {
-                            sessionState = "backgroundUpdateGetState";
+                            session.state = "backgroundUpdateGetState";
                             printerGetStatus(printerSocket);
                             addEntryToLog("protocol.js - onData BackGround- got: GotControl: " + responseString, consoleDebug);
                         }
                     } else if (responseString.split(";")[1] == "Control failed.") { // CMD M601 Received.;Control failed.;ok;
-                        sessionState = "blocked";
+                        session.state = "blocked";
+                        session.lastError = "blocked";
                         shutdownConnection(socket);
                         addEntryToLog("protocol.js - onData - got: NO Control: " + responseString, consoleDebug, "warn");
                     }
                     break;
                 case "CMD M602": // got approved release control for printer
-                    sessionState = "released";
+                    session.state = "released";
                     addEntryToLog("protocol.js - onData - got: ControlRelease: " + responseString, consoleDebug);
                     shutdownConnection(socket);
                     if (global.appPaused) {
-                        sessionState = "backgroundUpdateIdle";
+                        session.state = "backgroundUpdateIdle";
                         addEntryToLog("protocol.js - onData BackGround- got: GotControl: " + responseString, consoleDebug);
                     }
                     break;
@@ -240,13 +232,14 @@ function startConnection() {
         };
         socket.onError = function (errorMessage) {
             // invoked after error occurs during connection
-            sessionState = "socketError";
+            session.state = "socketError";
+            session.lastError = "socketError";
             console.log("protocol.js - onError: " + errorMessage);
             addEntryToLog("protocol.js - onError: " + errorMessage);
         };
         socket.onClose = function (hasError) {
             // invoked after connection close
-            sessionState = "closed";
+            session.state = "closed";
             addEntryToLog("protocol.js - onClose - hasError: " + hasError, consoleDebug);
         };
 
@@ -257,15 +250,23 @@ function startConnection() {
             printer_port_user,
             function () {
                 // onSuccess - invoked after successful opening of socket
-                sessionState = "socketOpened";
-                addEntryToLog("protocol.js (startConnection - socket.open) - onSuccess - session: " + sessionState, consoleDebug);
+                session.state = "socketOpened";
+                addEntryToLog("protocol.js (startConnection - socket.open) - onSuccess - session: " + session.state, consoleDebug);
                 // according to printer protocol -> at first requesting control
                 sendMessage(socket, request_control_message);
             },
             function (errorMessage) {
                 // onError - invoked after unsuccessful opening of socket
-                sessionState = "socketOpenError";
-                addEntryToLog("protocol.js (startConnection socket.open) - open -> onError: " + errorMessage + " - session: " + sessionState, consoleDebug);
+                session.state = "socketOpenError";
+                if(errorMessage.startsWith("Host unreachable")) {
+                    session.lastError = "hostUnreachable";
+                } else if(errorMessage.endsWith("(Connection timed out)")) {
+                    session.lastError = "connTimeout";
+                } else {
+                    session.lastError = "socketOpenError";
+                }
+                
+                addEntryToLog("protocol.js (startConnection socket.open) - open -> onError: " + errorMessage + " - session: " + session.state, consoleDebug);
             });
 
     } catch (error) {

@@ -151,7 +151,12 @@ function updateValuesFromGlobal() {
     const allElements = document.querySelectorAll('[id^="global."]');
     allElements.forEach(element => {
         const varObjAttr = (element.id).split('.');
-        let valueFromGlobal = global[varObjAttr[1]][varObjAttr[2]][varObjAttr[3]];
+        let valueFromGlobal = '';
+        if(varObjAttr.length == 3) {
+            valueFromGlobal = global[varObjAttr[1]][varObjAttr[2]];
+        } else {
+            valueFromGlobal = global[varObjAttr[1]][varObjAttr[2]][varObjAttr[3]];
+        }
         let elemValueType = 'innerText';
         // for input type elements
         if (element.nodeName == "INPUT") {

@@ -46,31 +46,35 @@ function startStopPrinterSession() {
 
 document.getElementById("appStarted").innerText = getTimestamp(true);
 
-// show sessionState
-let cacheSessionState = '';
+// show session.state
+let cacheSessionState = session.state;
 let cachesessionCheckCounter = '';
 let debugCheckSessionTimer = null;
+
 
 function startCheckSession() {
     addDebugEntryToLog("startCheckSession - with setInterval - timerid: " + debugCheckSessionTimer);
     if (debugCheckSessionTimer == null) { // only if timer cleared fully, then 
         debugCheckSessionTimer = setInterval(function () {
-            if (cacheSessionState != sessionState) {
-                addDebugEntryToLog("session changed - " + cacheSessionState + " -> " + sessionState);
-                cacheSessionState = sessionState;
-                document.getElementById("sessionState").innerText = sessionState;
-                if (sessionState == "established") {
+            if (cacheSessionState != session.state) {
+                addDebugEntryToLog("session changed - " + cacheSessionState + " -> " + session.state);
+                cacheSessionState = session.state;
+                // update debug visible elements
+                document.getElementById("session.state").innerText = session.state;
+                document.getElementById("session.lastError").innerText = session.lastError;
+
+                if (session.state == "established") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#009445"; //green
                     global.settings.retryCnt = 0; // retry cnt 0, because session is successfully established
-                } else if (sessionState == "releasing") {
+                } else if (session.state == "releasing") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#10a4eb"; //lightblue
-                } else if (sessionState == "finished") {
+                } else if (session.state == "finished") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#00cf5c"; //light green
-                    startRetries(5, sessionState);
-                } else if (sessionState == "blocked") {
+                    if(session.lastError != "connTimeout") { startRetries(5, session.state); }
+                } else if (session.state == "blocked") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#542d2d"; //brown
-                    startRetries(20, sessionState);
-                } else if (sessionState.startsWith("backgroundUpdate")) {
+                    startRetries(20, session.state);
+                } else if (session.state.startsWith("backgroundUpdate")) {
                     document.getElementById("initiateConnection").parentElement.style.background = "#d8e300"; // yellow
                 } else {
                     document.getElementById("initiateConnection").parentElement.style.background = "#e80b0b"; //red
@@ -91,7 +95,7 @@ function startCheckSession() {
             if (!baseConnection.active) {
                 clearInterval(debugCheckSessionTimer);
                 debugCheckSessionTimer = null;
-                addDebugEntryToLog("sessionTimer Stopped", true, true);
+                addDebugEntryToLog("sessionCheckTimer Stopped", true, true);
             }
         }, 100);
     }

@@ -29,6 +29,7 @@ var aero;
     createCommonFooter();
     writeVersionInfo();
     placeConnectButton();
+    registerEventsForElemValueChagnedForAnimation();
 }());
 
 function onDeviceReady() {
@@ -52,11 +53,11 @@ function onDeviceReady() {
             foreground: false,
             sound: false
         });
-        cordova.plugins.notification.local.on('trigger', function(notification) {
+        cordova.plugins.notification.local.on('trigger', function (notification) {
             addDebugEntryToLog("update notification trigger: " + notification.id);
         });
         addDebugEntryToLog("starting testTimer: " + testTimer);
-        testTimer = setInterval( function () {
+        testTimer = setInterval(function () {
             addDebugEntryToLog("testTimer triggered: " + testTimer);
             cordova.plugins.notification.local.update({
                 id: 42,
@@ -129,10 +130,10 @@ function configureBackgroundMode() {
     // cordova.plugins.backgroundMode.on('activate', function () {
     //     global.appPaused = true;
     //     global.appResumed = false;
-    //     addEntryToLog(".backgroundMode.on('activate') - " + sessionState, consoleDebug);
+    //     addEntryToLog(".backgroundMode.on('activate') - " + session.state, consoleDebug);
     //     // backgroundModeTimer = setInterval(function () {
     //     //     if (baseConnection.active) {
-    //     //         sessionState = "backgroundUpdateStarting";
+    //     //         session.state = "backgroundUpdateStarting";
     //     //         backgroundSocket = startConnection();
     //     //     }
     //     // }, 5000);
@@ -141,7 +142,7 @@ function configureBackgroundMode() {
     // cordova.plugins.backgroundMode.on('deactivate', function () {
     //     global.appPaused = false;
     //     global.appResumed = true;
-    //     addEntryToLog(".backgroundMode.on('deactivate') - " + sessionState, consoleDebug);
+    //     addEntryToLog(".backgroundMode.on('deactivate') - " + session.state, consoleDebug);
     //     clearInterval(backgroundModeTimer);
     // });
 }
@@ -214,22 +215,22 @@ function placeConnectButton() {
     document.getElementsByTagName("header")[0].appendChild(newDiv2);
 }
 
-// value update with animation
-forEachElement(Array.from(document.querySelectorAll('[id^="global.printerData."]')), function (el) {
-    
-    observer = new MutationObserver(function (mutationsList, observer) {
-        // console.log(mutationsList);
-        const elem = mutationsList[0].target;
-        elem.classList.add("animateValue");
-        elem.style.color = "#eee";
-        // console.log("event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
-        setTimeout(function () {
-            elem.style.color = "black";
-            // console.log("timeout --- event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
-        }, 250);
+function registerEventsForElemValueChagnedForAnimation() {
+    forEachElement(Array.from(document.querySelectorAll('[id^="global.printerData."]')), function (el) {
+
+        observer = new MutationObserver(function (mutationsList, observer) {
+            // console.log(mutationsList);
+            const elem = mutationsList[0].target;
+            elem.classList.add("animateValue");
+            elem.style.color = "#eee";
+            // console.log("event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
+            setTimeout(function () {
+                elem.style.color = "black";
+                // console.log("timeout --- event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
+            }, 250);
+        });
+
+        observer.observe(el, { characterData: false, childList: true, attributes: false });
+        console.log("main.js - add eventListener for value change in element id: " + el.id);
     });
-
-    observer.observe(el, { characterData: false, childList: true, attributes: false });
-    console.log("main.js - add eventListener for value change in element id: " + el.id);
-
-});
+}
