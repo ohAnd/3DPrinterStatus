@@ -28,7 +28,7 @@ aero.touchclick(document.getElementById("connectStartStop"), function () {
 });
 
 function startStopPrinterSession() {
-    if (!baseConnection.active || global.info.settings.retryCnt != 0) {
+    if (!baseConnection.active || global.settings.retryCnt != 0) {
         baseConnection.active = true;
         printerSocket = sessionStart();
         document.getElementById("initiateConnection").innerText = "disconnect";
@@ -61,7 +61,7 @@ function startCheckSession() {
                 document.getElementById("sessionState").innerText = sessionState;
                 if (sessionState == "established") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#009445"; //green
-                    global.info.settings.retryCnt = 0; // retry cnt 0, because session is successfully established
+                    global.settings.retryCnt = 0; // retry cnt 0, because session is successfully established
                 } else if (sessionState == "releasing") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#10a4eb"; //lightblue
                 } else if (sessionState == "finished") {
@@ -99,11 +99,11 @@ function startCheckSession() {
 
 function startRetries(retries, state = '') {
     if (baseConnection.active) { // retrigger session with increment of retry counter if user not closed the session
-        global.info.settings.retryCnt = global.info.settings.retryCnt + 1;
-        if (global.info.settings.retryCnt > retries) {
-            global.info.settings.retryCnt = 0;
+        global.settings.retryCnt = global.settings.retryCnt + 1;
+        if (global.settings.retryCnt > retries) {
+            global.settings.retryCnt = 0;
         } else {
-            addDebugEntryToLog("session changed -> " + state + " - starting retry no. " + global.info.settings.retryCnt, true, true, 'warn');
+            addDebugEntryToLog("session changed -> " + state + " - starting retry no. " + global.settings.retryCnt, true, true, 'warn');
         }
         // if retryCnt > 0 start new connection, else stop session
         startStopPrinterSession();

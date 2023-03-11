@@ -46,7 +46,7 @@
             </p>
             <p style="text-align: center;">short workaround ;-) <a id="printerVideoLink" href="">click_me</a></p>
         </section>
-        <section id="debugWindowStartscreen" style="display:none;">
+        <section id="debugWindowOnStart" style="display:none;">
             <div>debug</div>
             <div>
                 <list_left>app started:</list_left>
@@ -58,7 +58,7 @@
             </div>
             <div>
                 <list_left>connection retry counter:</list_left>
-                <list_right id="global.info.settings.retryCnt">none</list_right>
+                <list_right id="global.settings.retryCnt">none</list_right>
             </div>
             <div>
                 <list_left>sessionState:</list_left>
@@ -327,7 +327,7 @@
                     min="1" max="65535">
                 <p class="smallText">e.g. 8899</p>
 
-                <label>stay connected in background <input id="global.info.settings.holdConnectionOn"
+                <label>stay connected in background <input id="global.settings.holdConnectionOn"
                         class="storageValue" type="checkbox"></label>
                 <label></label>
                 <label>to check the right functionality inside your local network</label>
@@ -356,10 +356,10 @@
             <hr>
             <fieldset>
                 <legend>appearance</legend>
-                <label>debug window in startscreen <input id="global.info.settings.debugWindowStartscreen" class="storageValue"
+                <label>debug window in startscreen <input id="global.settings.screen.debugWindowOnStart" class="storageValue"
                         type="checkbox"></label>
                 <p class="smallText">shows a debugscreen with info for connection state</p>
-                <label>dark mode (invert colors) <input id="global.info.settings.isDarkModeOn" class="storageValue"
+                <label>dark mode (invert colors) <input id="global.settings.isDarkModeOn" class="storageValue"
                         type="checkbox"></label>
                 <p class="smallText">@todo - has to be developed</p>
 

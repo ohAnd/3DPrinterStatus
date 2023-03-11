@@ -216,8 +216,7 @@ function placeConnectButton() {
 
 // value update with animation
 forEachElement(Array.from(document.querySelectorAll('[id^="global.printerData."]')), function (el) {
-    const varObjAttr = (el.id).split('.');
-
+    
     observer = new MutationObserver(function (mutationsList, observer) {
         // console.log(mutationsList);
         const elem = mutationsList[0].target;
@@ -225,15 +224,12 @@ forEachElement(Array.from(document.querySelectorAll('[id^="global.printerData."]
         elem.style.color = "#eee";
         // console.log("event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
         setTimeout(function () {
-            // elem.classList.remove("animateValue");
             elem.style.color = "black";
             // console.log("timeout --- event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
         }, 250);
-
-        // elem.style.animation = "";
     });
 
     observer.observe(el, { characterData: false, childList: true, attributes: false });
-    console.log("add event change for value: " + el.id);
+    console.log("main.js - add eventListener for value change in element id: " + el.id);
 
 });
