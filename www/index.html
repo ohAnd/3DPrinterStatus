@@ -408,7 +408,7 @@
         <!-- will be filled by script -->
     </footer>
 
-    <div class="dialog">
+    <div class="dialog" style="bottom: 32px;">
         <h2>Test Connection</h2>
         <p>here you can check the connection with some logging and details to the conenction handling</p>
         <!-- <pre>aero.showDialog(<em>element</em>);</pre> -->
@@ -426,6 +426,13 @@
         <p>
             <small>Touch the background to close.</small>
         </p>
+    </div>
+
+    <div class="dialog" id="messageBox">
+        <h2 id="messageToUserTitle">attention</h2>
+        <p><br></p>
+        <!-- <pre>aero.showDialog(<em>element</em>);</pre> -->
+        <p id="messageToUser"></p>
     </div>
 
     <!-- <footer class="form"> -->

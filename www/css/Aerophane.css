@@ -498,10 +498,10 @@ body>div.dialog {
     background: #fff;
     top: 64px;
     right: 32px;
-    bottom: 32px;
     left: 32px;
     overflow: auto;
     z-index: 2;
+    padding-bottom: 20px;
 }
 
 #aeroDialogSelect>div {

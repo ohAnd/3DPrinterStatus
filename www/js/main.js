@@ -234,3 +234,9 @@ function registerEventsForElemValueChagnedForAnimation() {
         console.log("main.js - add eventListener for value change in element id: " + el.id);
     });
 }
+
+function showUserMessage(title, message) {
+    document.getElementById("messageToUserTitle").innerText = title;
+    document.getElementById("messageToUser").innerText = message;
+    aero.showDialog(document.querySelector("#messageBox"));
+}

@@ -70,10 +70,18 @@ function startCheckSession() {
                     document.getElementById("initiateConnection").parentElement.style.background = "#10a4eb"; //lightblue
                 } else if (session.state == "finished") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#00cf5c"; //light green
-                    if(session.lastError != "connTimeout") { startRetries(5, session.state); }
+                    if (session.lastError != "connTimeout") {
+                        startRetries(5, session.state);
+                        showUserMessage("Connection to printer failed","connection error: " + session.lastError);
+                    } else {
+                        showUserMessage("Connection to printer failed","connection error - try to connect timed out " + session.lastError);
+                    }
                 } else if (session.state == "blocked") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#542d2d"; //brown
                     startRetries(20, session.state);
+                    if (session.lastError != "blocked") {
+                        showUserMessage("Connection to printer failed","printer currently blocked by another source. E.g. your PC/MAC with the slicer software.");
+                    }
                 } else if (session.state.startsWith("backgroundUpdate")) {
                     document.getElementById("initiateConnection").parentElement.style.background = "#d8e300"; // yellow
                 } else {
@@ -96,6 +104,8 @@ function startCheckSession() {
                 clearInterval(debugCheckSessionTimer);
                 debugCheckSessionTimer = null;
                 addDebugEntryToLog("sessionCheckTimer Stopped", true, true);
+
+                // showUserMessage("Connection to printer failed","printer currently blocked by another source. E.g. your PC/MAC with the slicer software.");
             }
         }, 100);
     }
