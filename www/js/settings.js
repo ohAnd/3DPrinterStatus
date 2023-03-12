@@ -28,7 +28,7 @@ aero.touchclick(document.getElementById("connectStartStop"), function () {
 });
 
 function startStopPrinterSession() {
-    if (!baseConnection.active || global.info.settings.retryCnt != 0) {
+    if (!baseConnection.active || global.settings.retryCnt != 0) {
         baseConnection.active = true;
         printerSocket = sessionStart();
         document.getElementById("initiateConnection").innerText = "disconnect";
@@ -38,7 +38,7 @@ function startStopPrinterSession() {
         baseConnection.active = false;
         sessionStop(printerSocket);
         document.getElementById("initiateConnection").innerText = "connect";
-        addEntryToLog("settings.js (event button connectStartStop) - stopped base connection", consoleDebug);
+        addEntryToLog("settings.js (event button connectStartStop) - stopped base connection - basicState: " + session.basicState, consoleDebug);
     }
 }
 
@@ -46,31 +46,44 @@ function startStopPrinterSession() {
 
 document.getElementById("appStarted").innerText = getTimestamp(true);
 
-// show sessionState
-let cacheSessionState = '';
+// show session.state
+let cacheSessionState = session.state;
 let cachesessionCheckCounter = '';
 let debugCheckSessionTimer = null;
 
+
 function startCheckSession() {
     addDebugEntryToLog("startCheckSession - with setInterval - timerid: " + debugCheckSessionTimer);
+    session.basicState = "normalConnected";
     if (debugCheckSessionTimer == null) { // only if timer cleared fully, then 
         debugCheckSessionTimer = setInterval(function () {
-            if (cacheSessionState != sessionState) {
-                addDebugEntryToLog("session changed - " + cacheSessionState + " -> " + sessionState);
-                cacheSessionState = sessionState;
-                document.getElementById("sessionState").innerText = sessionState;
-                if (sessionState == "established") {
+            if (cacheSessionState != session.state && session.basicState != "pausedInBackground") {
+                addDebugEntryToLog("session changed - " + cacheSessionState + " -> " + session.state) + " - basicState: " + session.basicState;
+                cacheSessionState = session.state;
+                // update debug visible elements
+                document.getElementById("session.state").innerText = session.state;
+                document.getElementById("session.lastError").innerText = session.lastError;
+
+                if (session.state == "established") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#009445"; //green
-                    global.info.settings.retryCnt = 0; // retry cnt 0, because session is successfully established
-                } else if (sessionState == "releasing") {
+                    global.settings.retryCnt = 0; // retry cnt 0, because session is successfully established
+                } else if (session.state == "releasing") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#10a4eb"; //lightblue
-                } else if (sessionState == "finished") {
+                } else if (session.state == "finished") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#00cf5c"; //light green
-                    startRetries(5, sessionState);
-                } else if (sessionState == "blocked") {
+                    if (session.lastError != "connTimeout") {
+                        startRetries(5, session.state);
+                        showUserMessage("Connection to printer failed", "connection error: " + session.lastError);
+                    } else {
+                        showUserMessage("Connection to printer failed", "connection error - try to connect -> timed out " + session.lastError);
+                    }
+                } else if (session.state == "blocked") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#542d2d"; //brown
-                    startRetries(20, sessionState);
-                } else if (sessionState.startsWith("backgroundUpdate")) {
+                    startRetries(20, session.state);
+                    if (session.lastError != "blocked") {
+                        showUserMessage("Connection to printer failed", "printer currently blocked by another source. E.g. your PC/MAC with the slicer software.");
+                    }
+                } else if (session.state.startsWith("backgroundUpdate")) {
                     document.getElementById("initiateConnection").parentElement.style.background = "#d8e300"; // yellow
                 } else {
                     document.getElementById("initiateConnection").parentElement.style.background = "#e80b0b"; //red
@@ -83,15 +96,31 @@ function startCheckSession() {
             if (cachesessionCheckCounter != sessionCheckCounter) {
                 cachesessionCheckCounter = sessionCheckCounter;
                 if (sessionCheckCounter % 30 == 0 && !global.appPaused) {
-                    addDebugEntryToLog("sessionTimer FOREground -> " + sessionCheckCounter, true, true);
-                } else if (global.appPaused) {
-                    addDebugEntryToLog("sessionTimer BACKground -> " + sessionCheckCounter, true, true);
+                    addDebugEntryToLog("sessionTimer FOREground -> " + sessionCheckCounter + " - basicState: " + session.basicState, true, true);
+                } else if (sessionCheckCounter % 30 == 0 && global.appPaused) {
+                    addDebugEntryToLog("sessionTimer BACKground -> " + sessionCheckCounter + " - basicState: " + session.basicState, true, true);
                 }
             }
-            if (!baseConnection.active) {
+            // check for user request state and stabilize throug app in background
+            if (baseConnection.active) {
+                // *** limitited network update in background needed
+                // pause the regular data update
+                if (global.appPaused && session.state == "established" && session.basicState != "pausedInBackground") {
+                    session.basicState = "pausedInBackground";
+                    sessionStop(printerSocket, "backgroundUpdateIdle");
+                    addDebugEntryToLog("connection to background - basicState: " + session.basicState, true, true);
+                } else if (global.appResumed && session.basicState == "pausedInBackground") {
+                    session.basicState = "restartFromBackground";
+                    printerSocket = sessionStart();
+                    addDebugEntryToLog("connection back from background - basicState: " + session.basicState, true, true);
+                }
+            } else { // ramp down everything if user connection disabled
                 clearInterval(debugCheckSessionTimer);
                 debugCheckSessionTimer = null;
-                addDebugEntryToLog("sessionTimer Stopped", true, true);
+                session.basicState = "disconnected";
+                addDebugEntryToLog("sessionCheckTimer Stopped - basicState: " + session.basicState, true, true);
+
+                // showUserMessage("Connection to printer failed","printer currently blocked by another source. E.g. your PC/MAC with the slicer software.");
             }
         }, 100);
     }
@@ -99,11 +128,11 @@ function startCheckSession() {
 
 function startRetries(retries, state = '') {
     if (baseConnection.active) { // retrigger session with increment of retry counter if user not closed the session
-        global.info.settings.retryCnt = global.info.settings.retryCnt + 1;
-        if (global.info.settings.retryCnt > retries) {
-            global.info.settings.retryCnt = 0;
+        global.settings.retryCnt = global.settings.retryCnt + 1;
+        if (global.settings.retryCnt > retries) {
+            global.settings.retryCnt = 0;
         } else {
-            addDebugEntryToLog("session changed -> " + state + " - starting retry no. " + global.info.settings.retryCnt, true, true, 'warn');
+            addDebugEntryToLog("session changed -> " + state + " - starting retry no. " + global.settings.retryCnt, true, true, 'warn');
         }
         // if retryCnt > 0 start new connection, else stop session
         startStopPrinterSession();
@@ -143,7 +172,8 @@ function notificationProgress(progressValue) {
                             smallIcon: 'res://info',
                             icon: 'res://img/3d-printing-icon.png',
                             progressBar: { value: progressValue },
-                            sound: null
+                            sound: null,
+                            foreground: false
                         });
                     } catch (error) {
                         console.log("settings.js - Exception 'cordova module not found': catching notification for browser debugging: " + error.message);
@@ -151,7 +181,7 @@ function notificationProgress(progressValue) {
                 }
                 // once notification every 10 % and at the end
                 if (cacheProgress != global.printerData.job.progress) {
-                    if ((progressValue % 10) == 0 || progressValue >= 99) {
+                    if (((progressValue % 10) == 0 && progressValue != 0) || progressValue >= 99) {
                         let titleVar = '3D printing running';
                         let textVar = 'current progress: ' + progressValue + " %";
                         if (progressValue >= 99) {
@@ -268,18 +298,6 @@ aero.touchclick(document.getElementById("testTCPConnectionStart"), function () {
             startConnectStateRepetion();
 
             printerSocket = startConnection();
-
-            // try {
-            //     cordova.plugins.notification.local.schedule({
-            //         title: 'test connection initiated',
-            //         text: 'please check the log in the settings detail view',
-            //         smallIcon: 'res://info',
-            //         icon: 'res://img/3d-printing-icon.png',
-            //         foreground: true
-            //     });
-            // } catch (error) {
-            //     console.log("settings.js - Exception 'cordova module not found': catching notification for browser debugging: " + error.message);
-            // }
 
             testConnection.active = true;
         } else {

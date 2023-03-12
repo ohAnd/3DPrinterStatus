@@ -11,16 +11,15 @@ var aero;
     }
 
     aero = new Aerophane(global.info.appname, [
-        { "name": "Home", "id": "home" }, //"../home/home.html" },
-        { "name": "3D print templates", "id": "templates" }, //"../list/list.html" },
-        // { "name": "Search", "href": "../search/search.html" },
-        { "name": "Settings", "id": "settings" } //"../settings/settings.html" }
+        { "name": "Home", "id": "home" },
+        { "name": "3D print infos", "id": "templates" },
+        { "name": "Settings", "id": "settings" }
     ], function () {
         console.log("after new Aerophane and ready")
         global.isDeviceReady = true;
 
-        onDeviceReady();
         cordova.plugins.notification.local.setDummyNotifications();
+        onDeviceReady();
         configureBackgroundMode();
 
     });
@@ -30,6 +29,7 @@ var aero;
     createCommonFooter();
     writeVersionInfo();
     placeConnectButton();
+    registerEventsForElemValueChagnedForAnimation();
 }());
 
 function onDeviceReady() {
@@ -37,20 +37,65 @@ function onDeviceReady() {
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
 
-    // document.addEventListener("pause", eventAppPausedCall, false);
-    // function eventAppPausedCall() {
-    //     global.appPaused = true;
-    //     global.appResumed = false;
-    //     addDebugEntryToLog("event - app paused (putted into background)");
-    // }
-    // document.addEventListener("resume", eventAppResumedCall, false);
-    // function eventAppResumedCall() {
-    //     global.appPaused = false;
-    //     global.appResumed = true;
-    //     addDebugEntryToLog("event - app resume (returned from background)");
-    // }
+    console.log(cordova.plugins.notification.local.launchDetails);
 
-    //cancel possible existing progress notification
+    let backgroundUpdateTimer = '';
+    let backgroundUpdateCounter = 0;
+
+    document.addEventListener("pause", eventAppPausedCall, false);
+    function eventAppPausedCall() {
+        global.appPaused = true;
+        global.appResumed = false;
+        addDebugEntryToLog("event - app paused (putted into background)");
+        if (global.settings.holdConnectionOn == 1 && baseConnection.active == true) {
+            cordova.plugins.notification.local.schedule({
+                id: 42,
+                text: "background update started",
+                foreground: false,
+                sound: false
+            });
+            cordova.plugins.notification.local.on('trigger', function (notification) {
+                addDebugEntryToLog("update notification trigger: " + notification.id);
+            });
+            addDebugEntryToLog("starting backgroundUpdateTimer: " + backgroundUpdateTimer);
+            backgroundUpdateTimer = setInterval(function () {
+                backgroundUpdateCounter++;
+                addDebugEntryToLog("backgroundUpdateTimer triggered: " + backgroundUpdateTimer + " - cnt: " + backgroundUpdateCounter + " min");
+                if ((backgroundUpdateCounter % 10) == 0) {
+                    cordova.plugins.notification.local.update({
+                        id: 42,
+                        text: "background update active since - " + backgroundUpdateCounter + " min",
+                        foreground: false,
+                        sound: false
+                    });
+                    addDebugEntryToLog("updated notification");
+                }
+                // start short connection in background for progress and status
+                printerSocket = sessionStartBackground();
+            }, 60000);
+        }
+    }
+
+
+    cordova.plugins.notification.local.on('trigger', (notification) => { // do something with notification
+        addDebugEntryToLog("update notification trigger: " + notification.id);
+    });
+
+    document.addEventListener("resume", eventAppResumedCall, false);
+    function eventAppResumedCall() {
+        global.appPaused = false;
+        global.appResumed = true;
+        addDebugEntryToLog("event - app resume (returned from background)");
+
+        clearInterval(backgroundUpdateTimer);
+        backgroundUpdateCounter = 0;
+
+        cordova.plugins.notification.local.clear(42, function () {
+            addDebugEntryToLog("update notification cleared");
+        });
+    }
+
+    // cancel possible existing progress notification
     cordova.plugins.notification.local.clear(global.info.notifications.progressID, function () {
         addDebugEntryToLog("onDeviceReady - notification progress cleared");
     });
@@ -66,8 +111,8 @@ function configureBackgroundMode() {
     //     // hidden: Boolean,
     //     // bigText: Boolean
     // });
-    cordova.plugins.backgroundMode.overrideBackButton();
-    cordova.plugins.backgroundMode.enable();
+    // cordova.plugins.backgroundMode.overrideBackButton();
+    // cordova.plugins.backgroundMode.enable();
 
     // // if "hw" back button is pressed - go to "home" - first page
     // document.addEventListener("backbutton", onBackKeyDown, false);
@@ -83,32 +128,32 @@ function configureBackgroundMode() {
     //     }
     // }
 
-    cordova.plugins.backgroundMode.onfailure = function(errorCode){
-        addEntryToLog("backgroundMode - failed : " + errorCode, consoleDebug);
-    };
-    
+    // cordova.plugins.backgroundMode.onfailure = function(errorCode){
+    //     addEntryToLog("backgroundMode - failed : " + errorCode, consoleDebug);
+    // };
+
 
     // react on event
-    let backgroundModeTimer = '';
-    let backgroundSocket = '';
-    cordova.plugins.backgroundMode.on('activate', function () {
-        global.appPaused = true;
-        global.appResumed = false;
-        addEntryToLog(".backgroundMode.on('activate') - " + sessionState, consoleDebug);
-        // backgroundModeTimer = setInterval(function () {
-        //     if (baseConnection.active) {
-        //         sessionState = "backgroundUpdateStarting";
-        //         backgroundSocket = startConnection();
-        //     }
-        // }, 5000);
-    });
+    // let backgroundModeTimer = '';
+    // let backgroundSocket = '';
+    // cordova.plugins.backgroundMode.on('activate', function () {
+    //     global.appPaused = true;
+    //     global.appResumed = false;
+    //     addEntryToLog(".backgroundMode.on('activate') - " + session.state, consoleDebug);
+    //     // backgroundModeTimer = setInterval(function () {
+    //     //     if (baseConnection.active) {
+    //     //         session.state = "backgroundUpdateStarting";
+    //     //         backgroundSocket = startConnection();
+    //     //     }
+    //     // }, 5000);
+    // });
 
-    cordova.plugins.backgroundMode.on('deactivate', function () {
-        global.appPaused = false;
-        global.appResumed = true;
-        addEntryToLog(".backgroundMode.on('deactivate') - " + sessionState, consoleDebug);
-        clearInterval(backgroundModeTimer);
-    });
+    // cordova.plugins.backgroundMode.on('deactivate', function () {
+    //     global.appPaused = false;
+    //     global.appResumed = true;
+    //     addEntryToLog(".backgroundMode.on('deactivate') - " + session.state, consoleDebug);
+    //     clearInterval(backgroundModeTimer);
+    // });
 }
 
 function createCommonFooter() {
@@ -179,26 +224,28 @@ function placeConnectButton() {
     document.getElementsByTagName("header")[0].appendChild(newDiv2);
 }
 
-// value update with animation
-forEachElement(Array.from(document.querySelectorAll('[id^="global.printerData."]')), function (el) {
-    const varObjAttr = (el.id).split('.');
+function registerEventsForElemValueChagnedForAnimation() {
+    forEachElement(Array.from(document.querySelectorAll('[id^="global.printerData."]')), function (el) {
 
-    observer = new MutationObserver(function (mutationsList, observer) {
-        // console.log(mutationsList);
-        const elem = mutationsList[0].target;
-        elem.classList.add("animateValue");
-        elem.style.color = "#eee";
-        // console.log("event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
-        setTimeout(function () {
-            // elem.classList.remove("animateValue");
-            elem.style.color = "black";
-            // console.log("timeout --- event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
-        }, 250);
+        observer = new MutationObserver(function (mutationsList, observer) {
+            // console.log(mutationsList);
+            const elem = mutationsList[0].target;
+            elem.classList.add("animateValue");
+            elem.style.color = "#eee";
+            // console.log("event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
+            setTimeout(function () {
+                elem.style.color = "black";
+                // console.log("timeout --- event change in value for " + elem.id + " new innerHtml: " + elem.innerHTML);
+            }, 250);
+        });
 
-        // elem.style.animation = "";
+        observer.observe(el, { characterData: false, childList: true, attributes: false });
+        console.log("main.js - add eventListener for value change in element id: " + el.id);
     });
+}
 
-    observer.observe(el, { characterData: false, childList: true, attributes: false });
-    console.log("add event change for value: " + el.id);
-
-});
+function showUserMessage(title, message) {
+    document.getElementById("messageToUserTitle").innerText = title;
+    document.getElementById("messageToUser").innerText = message;
+    aero.showDialog(document.querySelector("#messageBox"));
+}
