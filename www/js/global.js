@@ -13,7 +13,7 @@ global.info.build = '%%BUILDNUMBER%%';
 global.info.build_date = '%%BUILDDATE%%';
 
 global.settings = {};
-global.settings.holdConnectionOn = 0;
+global.settings.holdConnectionOn = 1;
 global.settings.isDarkModeOn = 0;
 global.settings.retryCnt = 0;
 global.settings.screen = {};
@@ -202,6 +202,7 @@ function updateValuesFromGlobal() {
     // other elements
     // update progress bar
     document.getElementById("printerProgressBar").style.width = global.printerData.job.progress + "%";
+    notificationProgress(global.printerData.job.progress);
     // update video link
     document.getElementById("printerVideoLink").href = global.printerData.base.printerCamLink;
 }

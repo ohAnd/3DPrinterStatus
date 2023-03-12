@@ -38,7 +38,7 @@ function startStopPrinterSession() {
         baseConnection.active = false;
         sessionStop(printerSocket);
         document.getElementById("initiateConnection").innerText = "connect";
-        addEntryToLog("settings.js (event button connectStartStop) - stopped base connection", consoleDebug);
+        addEntryToLog("settings.js (event button connectStartStop) - stopped base connection - basicState: " + session.basicState, consoleDebug);
     }
 }
 
@@ -54,10 +54,11 @@ let debugCheckSessionTimer = null;
 
 function startCheckSession() {
     addDebugEntryToLog("startCheckSession - with setInterval - timerid: " + debugCheckSessionTimer);
+    session.basicState = "normalConnected";
     if (debugCheckSessionTimer == null) { // only if timer cleared fully, then 
         debugCheckSessionTimer = setInterval(function () {
-            if (cacheSessionState != session.state) {
-                addDebugEntryToLog("session changed - " + cacheSessionState + " -> " + session.state);
+            if (cacheSessionState != session.state && session.basicState != "pausedInBackground") {
+                addDebugEntryToLog("session changed - " + cacheSessionState + " -> " + session.state) + " - basicState: " + session.basicState;
                 cacheSessionState = session.state;
                 // update debug visible elements
                 document.getElementById("session.state").innerText = session.state;
@@ -72,15 +73,15 @@ function startCheckSession() {
                     document.getElementById("initiateConnection").parentElement.style.background = "#00cf5c"; //light green
                     if (session.lastError != "connTimeout") {
                         startRetries(5, session.state);
-                        showUserMessage("Connection to printer failed","connection error: " + session.lastError);
+                        showUserMessage("Connection to printer failed", "connection error: " + session.lastError);
                     } else {
-                        showUserMessage("Connection to printer failed","connection error - try to connect timed out " + session.lastError);
+                        showUserMessage("Connection to printer failed", "connection error - try to connect -> timed out " + session.lastError);
                     }
                 } else if (session.state == "blocked") {
                     document.getElementById("initiateConnection").parentElement.style.background = "#542d2d"; //brown
                     startRetries(20, session.state);
                     if (session.lastError != "blocked") {
-                        showUserMessage("Connection to printer failed","printer currently blocked by another source. E.g. your PC/MAC with the slicer software.");
+                        showUserMessage("Connection to printer failed", "printer currently blocked by another source. E.g. your PC/MAC with the slicer software.");
                     }
                 } else if (session.state.startsWith("backgroundUpdate")) {
                     document.getElementById("initiateConnection").parentElement.style.background = "#d8e300"; // yellow
@@ -95,15 +96,29 @@ function startCheckSession() {
             if (cachesessionCheckCounter != sessionCheckCounter) {
                 cachesessionCheckCounter = sessionCheckCounter;
                 if (sessionCheckCounter % 30 == 0 && !global.appPaused) {
-                    addDebugEntryToLog("sessionTimer FOREground -> " + sessionCheckCounter, true, true);
-                } else if (global.appPaused) {
-                    addDebugEntryToLog("sessionTimer BACKground -> " + sessionCheckCounter, true, true);
+                    addDebugEntryToLog("sessionTimer FOREground -> " + sessionCheckCounter + " - basicState: " + session.basicState, true, true);
+                } else if (sessionCheckCounter % 30 == 0 && global.appPaused) {
+                    addDebugEntryToLog("sessionTimer BACKground -> " + sessionCheckCounter + " - basicState: " + session.basicState, true, true);
                 }
             }
-            if (!baseConnection.active) {
+            // check for user request state and stabilize throug app in background
+            if (baseConnection.active) {
+                // *** limitited network update in background needed
+                // pause the regular data update
+                if (global.appPaused && session.state == "established" && session.basicState != "pausedInBackground") {
+                    session.basicState = "pausedInBackground";
+                    sessionStop(printerSocket, "backgroundUpdateIdle");
+                    addDebugEntryToLog("connection to background - basicState: " + session.basicState, true, true);
+                } else if (global.appResumed && session.basicState == "pausedInBackground") {
+                    session.basicState = "restartFromBackground";
+                    printerSocket = sessionStart();
+                    addDebugEntryToLog("connection back from background - basicState: " + session.basicState, true, true);
+                }
+            } else { // ramp down everything if user connection disabled
                 clearInterval(debugCheckSessionTimer);
                 debugCheckSessionTimer = null;
-                addDebugEntryToLog("sessionCheckTimer Stopped", true, true);
+                session.basicState = "disconnected";
+                addDebugEntryToLog("sessionCheckTimer Stopped - basicState: " + session.basicState, true, true);
 
                 // showUserMessage("Connection to printer failed","printer currently blocked by another source. E.g. your PC/MAC with the slicer software.");
             }

@@ -39,33 +39,41 @@ function onDeviceReady() {
 
     console.log(cordova.plugins.notification.local.launchDetails);
 
-    let testTimer = '';
+    let backgroundUpdateTimer = '';
+    let backgroundUpdateCounter = 0;
 
     document.addEventListener("pause", eventAppPausedCall, false);
     function eventAppPausedCall() {
         global.appPaused = true;
         global.appResumed = false;
         addDebugEntryToLog("event - app paused (putted into background)");
-
-        cordova.plugins.notification.local.schedule({
-            id: 42,
-            text: "background update started",
-            foreground: false,
-            sound: false
-        });
-        cordova.plugins.notification.local.on('trigger', function (notification) {
-            addDebugEntryToLog("update notification trigger: " + notification.id);
-        });
-        addDebugEntryToLog("starting testTimer: " + testTimer);
-        testTimer = setInterval(function () {
-            addDebugEntryToLog("testTimer triggered: " + testTimer);
-            cordova.plugins.notification.local.update({
+        if (global.settings.holdConnectionOn == 1 && baseConnection.active == true) {
+            cordova.plugins.notification.local.schedule({
                 id: 42,
-                text: "background update triggered",
+                text: "background update started",
                 foreground: false,
                 sound: false
             });
-        }, 60000);
+            cordova.plugins.notification.local.on('trigger', function (notification) {
+                addDebugEntryToLog("update notification trigger: " + notification.id);
+            });
+            addDebugEntryToLog("starting backgroundUpdateTimer: " + backgroundUpdateTimer);
+            backgroundUpdateTimer = setInterval(function () {
+                backgroundUpdateCounter++;
+                addDebugEntryToLog("backgroundUpdateTimer triggered: " + backgroundUpdateTimer + " - cnt: " + backgroundUpdateCounter + " min");
+                if ((backgroundUpdateCounter % 10) == 0) {
+                    cordova.plugins.notification.local.update({
+                        id: 42,
+                        text: "background update active since - " + backgroundUpdateCounter + " min",
+                        foreground: false,
+                        sound: false
+                    });
+                    addDebugEntryToLog("updated notification");
+                }
+                // start short connection in background for progress and status
+                printerSocket = sessionStartBackground();
+            }, 60000);
+        }
     }
 
 
@@ -79,7 +87,8 @@ function onDeviceReady() {
         global.appResumed = true;
         addDebugEntryToLog("event - app resume (returned from background)");
 
-        clearInterval(testTimer);
+        clearInterval(backgroundUpdateTimer);
+        backgroundUpdateCounter = 0;
 
         cordova.plugins.notification.local.clear(42, function () {
             addDebugEntryToLog("update notification cleared");

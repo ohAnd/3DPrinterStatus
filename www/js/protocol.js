@@ -35,6 +35,7 @@ var BUFFER_SIZE = 1024
 
 const session = {};
 session.state = 'booted';
+session.basicState = 'disconnected';
 session.checkTimer = null;
 session.lastError = 'none';
 
@@ -51,33 +52,31 @@ let printerSocket = '';
 function reactOnCmdsFromPrinter(responseCommand, responseString) {
     switch (responseCommand) {
         case "CMD M115": //request_info_message
-            addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_info_message: " + responseString, consoleDebug);
+            // addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_info_message: " + responseString, consoleDebug);
             global.printerData.info = decodeInfo(responseString);
             break;
         case "CMD M119": //request_status
-            addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_status_message: " + responseString, consoleDebug);
+            // addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_status_message: " + responseString, consoleDebug);
             global.printerData.status = decodeStatus(responseString);
-            if (global.appPaused) {
-                addEntryToLog("protocol.js - reactOnCmdsFromPrinter BackGround - got: request_status_message: " + responseString, consoleDebug);
-                session.state = "backgroundUpdateGetProgress";
-                printerGetProgress(backgroundSocket);
+            if(global.appPaused && session.basicState == "pausedInBackground") {
+                addEntryToLog("protocol.js - onData - got: request_status_message ask for release - basicState: " + session.basicState, consoleDebug);
+                sessionStop(printerSocket);
             }
             break;
         case "CMD M105": //request_temp
-            addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_temp_message: " + responseString, consoleDebug);
+            // addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_temp_message: " + responseString, consoleDebug);
             global.printerData.temps = decodeTemp(responseString);
             break;
         case "CMD M27 ": //request_progress
-            addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_progress: " + responseString, consoleDebug);
+            // addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_progress: " + responseString, consoleDebug);
             global.printerData.job = decodeProgress(responseString);
-            if (global.appPaused) {
-                addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_progress: " + responseString, consoleDebug);
-                session.state = "backgroundUpdateControlEnd";
-                printerControlEnd(backgroundSocket);
+            if(global.appPaused && session.basicState == "pausedInBackground") {
+                printerGetStatus(printerSocket);
+                addEntryToLog("protocol.js - onData - got: request_progress ask for status - basicState: " + session.basicState, consoleDebug);
             }
             break;
         case "CMD M114": // request_head_position
-            addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_head_position: " + responseString, consoleDebug);
+            // addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_head_position: " + responseString, consoleDebug);
             global.printerData.headPos = decodeHeadPositions(responseString);
             break;
         default:
@@ -94,13 +93,18 @@ function sessionStart() {
     return socket;
 }
 
+function sessionStartBackground() {
+    session.state = "initiatedInBackground";
+    let socket = startConnection();
+    return socket;
+}
+
 let lastState = '';
 let sessionCheckCounter = 0;
 function sessionCheck(printerSocket) {
     if (session.checkTimer == null) {
         session.checkTimer = setInterval(function () {
             let socketState = getSocketState(printerSocket);
-            // checkAndSwitchInBackgroundMode(printerSocket);
             // 1st layer
             if (socketState == "OPENED") {
                 // 2nd layer
@@ -111,7 +115,7 @@ function sessionCheck(printerSocket) {
                     }
                     if ((sessionCheckCounter % 3) == 0) {
                         printerGetProgress(printerSocket);
-                        addEntryToLog("sessionCheck printerGetProgress - cnt: " + sessionCheckCounter, true, true, 'warn');
+                        // addEntryToLog("sessionCheck printerGetProgress - cnt: " + sessionCheckCounter, true, true, 'warn');
                     }
                     if ((sessionCheckCounter % 11) == 0) {
                         printerGetStatus(printerSocket);
@@ -119,7 +123,7 @@ function sessionCheck(printerSocket) {
                     }
                     if ((sessionCheckCounter % 15) == 0) {
                         printerGetInfo(printerSocket);
-                        addEntryToLog("sessionCheck printerGetInfo - cnt: " + sessionCheckCounter, true, true, 'warn');
+                        // addEntryToLog("sessionCheck printerGetInfo - cnt: " + sessionCheckCounter, true, true, 'warn');
                     }
                 } else if (session.state == 'blocked') {
                     addEntryToLog("sessionCheck at state " + session.state + " - cnt: " + sessionCheckCounter + " - stopSessionTimer", true, true);
@@ -161,18 +165,6 @@ function stopSessionTimer(timerVar) {
     session.checkTimer = null;
 }
 
-// *** limitited network update in background needed
-// pause the regular data update
-function checkAndSwitchInBackgroundMode(printerSocket) {
-    if (baseConnection.active) {
-        if (global.appPaused && (getSocketState(printerSocket)) == "OPENED") {
-            sessionStop(printerSocket, "backgroundUpdateIdle");
-        } else if ((getSocketState(printerSocket)) != "OPENED") {
-            printerSocket = sessionStart();
-        }
-    }
-}
-
 
 // *****************
 
@@ -201,28 +193,22 @@ function startConnection() {
                     // CMD M601 Received.;Control Success.;ok;
                     if (responseString.split(";")[1] == "Control Success.") {
                         session.state = "established";
-                        addEntryToLog("protocol.js - onData - got: GotControl: " + responseString, consoleDebug);
-                        // if backgorund mode
-                        if (global.appPaused) {
-                            session.state = "backgroundUpdateGetState";
-                            printerGetStatus(printerSocket);
-                            addEntryToLog("protocol.js - onData BackGround- got: GotControl: " + responseString, consoleDebug);
+                        addEntryToLog("protocol.js - onData - got: GotControl: " + responseString + " - basicState: " + session.basicState, consoleDebug);
+                        if(global.appPaused && session.basicState == "pausedInBackground") {
+                            printerGetProgress(printerSocket);
+                            addEntryToLog("protocol.js - onData - ask for progress - basicState: " + session.basicState, consoleDebug);
                         }
                     } else if (responseString.split(";")[1] == "Control failed.") { // CMD M601 Received.;Control failed.;ok;
                         session.state = "blocked";
                         session.lastError = "blocked";
                         shutdownConnection(socket);
-                        addEntryToLog("protocol.js - onData - got: NO Control: " + responseString, consoleDebug, "warn");
+                        addEntryToLog("protocol.js - onData - got: NO Control: " + responseString + " - basicState: " + session.basicState, consoleDebug, "warn");
                     }
                     break;
                 case "CMD M602": // got approved release control for printer
                     session.state = "released";
-                    addEntryToLog("protocol.js - onData - got: ControlRelease: " + responseString, consoleDebug);
+                    addEntryToLog("protocol.js - onData - got: ControlRelease: " + responseString + " - basicState: " + session.basicState, consoleDebug);
                     shutdownConnection(socket);
-                    if (global.appPaused) {
-                        session.state = "backgroundUpdateIdle";
-                        addEntryToLog("protocol.js - onData BackGround- got: GotControl: " + responseString, consoleDebug);
-                    }
                     break;
                 default: // all other should be responses
                     reactOnCmdsFromPrinter(responseCommand, responseString);
