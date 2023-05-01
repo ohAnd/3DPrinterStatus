@@ -89,6 +89,8 @@ function onDeviceReady() {
 
         clearInterval(backgroundUpdateTimer);
         backgroundUpdateCounter = 0;
+        // stopping possible active background connection
+        sessionStop(printerSocket,"releasingFromBackground");
 
         cordova.plugins.notification.local.clear(42, function () {
             addDebugEntryToLog("update notification cleared");

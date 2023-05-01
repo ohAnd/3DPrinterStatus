@@ -124,6 +124,8 @@ function restoreAllUserDataFromStorage() {
 
         return archive;
     }
+    // update video link
+    document.getElementById("printerVideoLink").href = global.printerData.base.printerCamLink;
 }
 
 // --> refresh changed global vars to local storage and update view element
@@ -169,15 +171,15 @@ function updateValuesFromGlobal() {
                 // update cam adress depending on standard or own webcam adress
                 if (element.id == "global.printerData.base.printerIPadressAlternative") {
                     if (valueFromGlobal == 1) {
-                        document.getElementById("global.printerData.base.printerCamLink").value = global.printerData.base.printerCamLink;
-                        document.getElementById("printerCamLinkUsed").innerHTML = global.printerData.base.printerCamLink;
                         document.getElementById("printerIPadressAlternativeEntry").style.display = "";
                         document.getElementById("printerIPadressStandardEntry").style.display = "none";
+                        document.getElementById("global.printerData.base.printerCamLink").value = global.printerData.base.printerCamLink;
+                        document.getElementById("printerVideoLink").href = global.printerData.base.printerCamLink;
                     } else {
-                        // global.printerData.base.printerCamLink = "http://" + global.printerData.base.printerIPadress + ":8080/?action=stream";
                         document.getElementById("printerCamLinkUsed").innerHTML = "http://" + global.printerData.base.printerIPadress + ":8080/?action=stream";
                         document.getElementById("printerIPadressAlternativeEntry").style.display = "none";
                         document.getElementById("printerIPadressStandardEntry").style.display = "";
+                        document.getElementById("printerVideoLink").href = "http://" + global.printerData.base.printerIPadress + ":8080/?action=stream";
                     }
                 }
                 //switch visbility of screens/ topics
@@ -203,8 +205,6 @@ function updateValuesFromGlobal() {
     // update progress bar
     document.getElementById("printerProgressBar").style.width = global.printerData.job.progress + "%";
     notificationProgress(global.printerData.job.progress);
-    // update video link
-    document.getElementById("printerVideoLink").href = global.printerData.base.printerCamLink;
 }
 
 // initalize all input elements with eventlistener to save inout to global vars
