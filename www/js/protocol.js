@@ -71,6 +71,9 @@ function reactOnCmdsFromPrinter(responseCommand, responseString) {
             // addEntryToLog("protocol.js - reactOnCmdsFromPrinter - got: request_progress: " + responseString, consoleDebug);
             global.printerData.job = decodeProgress(responseString);
             if(global.appPaused && session.basicState == "pausedInBackground") {
+                // trigger progress notification in background
+                notificationProgress(global.printerData.job.progress);
+                // next step after getting progress -> get current printer status
                 printerGetStatus(printerSocket);
                 addEntryToLog("protocol.js - onData - got: request_progress ask for status - basicState: " + session.basicState, consoleDebug);
             }
